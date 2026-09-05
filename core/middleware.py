@@ -4,7 +4,7 @@ from businesses.models import Business
 
 
 class CurrentBusinessMiddleware:
-    """Expose current_business on request from session (multi-tenant)."""
+    """Expose current_business on request from session / user profile."""
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -14,11 +14,13 @@ class CurrentBusinessMiddleware:
             settings, "DEFAULT_BUSINESS_ID", ""
         )
         business = Business.objects.filter(pk=business_id).first() if business_id else None
-        if business is None and request.session.get("demo_logged_in"):
-            # Fall back to first available tenant for this session
-            business = Business.objects.first()
-            if business is not None:
+
+        if business is None and getattr(request, "user", None) and request.user.is_authenticated:
+            profile = getattr(request.user, "profile", None)
+            if profile and profile.business_id:
+                business = profile.business
                 request.session["current_business_id"] = business.pk
+
         request.current_business = business
         request.current_business_id = business.pk if business else None
         return self.get_response(request)

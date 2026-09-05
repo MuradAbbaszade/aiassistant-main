@@ -640,6 +640,98 @@ a { color: inherit; text-decoration: none; }
   padding: 2rem;
   box-shadow: 0 0 40px rgba(0, 217, 255, 0.08);
 }
+.auth-panel-wide { width: min(560px, 100%); }
+.auth-heading {
+  margin: 0.35rem 0 0.35rem;
+  font-size: 1.55rem;
+  color: var(--ice);
+}
+.auth-form label { margin-top: 0.75rem; }
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.field-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+.phone-field {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--navy);
+}
+.phone-prefix {
+  display: grid;
+  place-items: center;
+  padding: 0 0.85rem;
+  background: rgba(0, 217, 255, 0.08);
+  color: var(--cyan);
+  font-weight: 700;
+  border-right: 1px solid var(--line);
+  white-space: nowrap;
+}
+.phone-field input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin: 0;
+}
+.setup-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.setup-card {
+  background: var(--metallic);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.35rem 1.25rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 100%;
+}
+.setup-card h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--ice);
+}
+.setup-card p { margin: 0; color: var(--silver); }
+.setup-note { font-size: 0.9rem; }
+.setup-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 217, 255, 0.1);
+  border: 1px solid var(--line);
+  font-size: 1.15rem;
+}
+.setup-link {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  background: none;
+  border: 0;
+  color: var(--cyan);
+  font-weight: 700;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+}
+.setup-link:hover { color: var(--purple); }
+.onboarding-section { max-width: 900px; }
+
+@media (max-width: 720px) {
+  .auth-grid { grid-template-columns: 1fr; }
+  .setup-choice-grid { grid-template-columns: 1fr; }
+}
 .auth-panel .brand {
   font-size: 1.85rem;
   font-weight: 800;

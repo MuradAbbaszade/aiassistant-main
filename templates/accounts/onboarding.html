@@ -5,28 +5,37 @@
 <header class="site-nav">
   <div class="site-nav-inner">
     <a href="/" class="brand">AI Assistant</a>
-    <a class="btn btn-primary" href="{% url 'analytics:dashboard' %}">{{ t.dash_dashboard }}</a>
+    <div class="nav-actions">
+      {% include "partials/lang_switcher.html" %}
+      <a class="btn btn-ghost" href="{% url 'accounts:logout' %}">{{ t.dash_logout }}</a>
+    </div>
   </div>
 </header>
-<section class="section">
+<section class="section onboarding-section">
   <h1>{{ t.onb_title }}</h1>
-  <p class="section-lead">{{ t.onb_lead }}</p>
-  <ol class="steps">
-    {% for s in steps %}
-    <li>
-      <div>
-        <strong>{{ s.title }}</strong>
-        <div class="muted">{{ s.desc }}</div>
-        {% if s.done %}<span class="badge badge-ok">{{ t.onb_done }}</span>{% else %}<span class="badge badge-warn">{{ t.onb_wait }}</span>{% endif %}
-      </div>
-    </li>
-    {% endfor %}
-  </ol>
-  <div style="display:flex;gap:0.6rem;margin-top:1.5rem;flex-wrap:wrap;">
-    <a class="btn btn-primary" href="{% url 'knowledge:list' %}">{{ t.onb_cta_kb }}</a>
-    <a class="btn btn-ghost" href="{% url 'ai:settings' %}">{{ t.onb_cta_ai }}</a>
-    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">{{ t.onb_cta_conv }}</a>
-    <a class="btn btn-ghost" href="{% url 'analytics:dashboard' %}">{{ t.dash_dashboard }}</a>
+  <p class="section-lead">
+    {% if user_name %}{{ t.onb_hello }} {{ user_name }}. {% endif %}{{ t.onb_choose_lead }}
+  </p>
+
+  <div class="setup-choice-grid">
+    <article class="setup-card">
+      <div class="setup-icon" aria-hidden="true">⚙</div>
+      <h2>{{ t.onb_manual_title }}</h2>
+      <p>{{ t.onb_manual_desc }}</p>
+      <p class="muted setup-note">{{ t.onb_manual_note }}</p>
+      <a class="setup-link" href="{% url 'accounts:onboarding_manual' %}">{{ t.onb_manual_cta }} →</a>
+    </article>
+
+    <article class="setup-card">
+      <div class="setup-icon" aria-hidden="true">💬</div>
+      <h2>{{ t.onb_msg_title }}</h2>
+      <p>{{ t.onb_msg_desc }}</p>
+      <p class="muted setup-note">{{ t.onb_msg_note }}</p>
+      <form method="post" action="{% url 'accounts:onboarding_message' %}">
+        {% csrf_token %}
+        <button class="setup-link" type="submit">{{ t.onb_msg_cta }} →</button>
+      </form>
+    </article>
   </div>
 </section>
 {% endblock %}

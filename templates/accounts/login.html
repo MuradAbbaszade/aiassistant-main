@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ t.login_title }}{% endblock %}
+{% block title %}{{ t.auth_login_title }} — AI Assistant{% endblock %}
 {% block body %}
 <div class="auth-shell">
   <div class="auth-panel">
@@ -7,12 +7,27 @@
       <div class="brand">AI Assistant</div>
       {% include "partials/lang_switcher.html" %}
     </div>
-    <p class="muted" style="margin-top:0;">{{ t.login_lead }}</p>
+    <h1 class="auth-heading">{{ t.auth_login_title }}</h1>
+    <p class="muted" style="margin-top:0;">{{ t.auth_login_lead }}</p>
     {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+    {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors }}</div>{% endif %}
 
-    <a class="btn btn-primary" style="width:100%;margin-top:1rem;" href="{% url 'accounts:instagram_login' %}">
-      {{ t.login_cta }}
-    </a>
+    <form method="post" class="auth-form" novalidate>
+      {% csrf_token %}
+      <label for="id_email">{{ t.auth_email }}</label>
+      <input id="id_email" type="email" name="email" value="{{ form.email.value|default:'' }}" required autocomplete="email">
+      {% if form.email.errors %}<div class="field-error">{{ form.email.errors.0 }}</div>{% endif %}
+
+      <label for="id_password">{{ t.auth_password }}</label>
+      <input id="id_password" type="password" name="password" required autocomplete="current-password">
+      {% if form.password.errors %}<div class="field-error">{{ form.password.errors.0 }}</div>{% endif %}
+
+      <button class="btn btn-primary" style="width:100%;margin-top:1.1rem;" type="submit">{{ t.auth_login_cta }}</button>
+    </form>
+    <p class="muted" style="margin-top:1rem;text-align:center;">
+      {{ t.auth_no_account }}
+      <a href="{% url 'accounts:register' %}" style="color:var(--cyan);font-weight:700;">{{ t.auth_register_link }}</a>
+    </p>
   </div>
 </div>
 {% endblock %}

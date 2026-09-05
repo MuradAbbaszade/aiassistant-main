@@ -211,7 +211,25 @@ REST_FRAMEWORK = {
 }
 
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/dashboard/"
+LOGIN_REDIRECT_URL = "/onboarding/"
 LOGOUT_REDIRECT_URL = "/"
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
+
+SUPPORT_WHATSAPP = env("SUPPORT_WHATSAPP", default="994705550117")
+
+# Email / OTP (leave EMAIL_HOST empty to use console + show OTP in UI when DEBUG)
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default=(
+        "django.core.mail.backends.smtp.EmailBackend"
+        if env("EMAIL_HOST", default="")
+        else "django.core.mail.backends.console.EmailBackend"
+    ),
+)
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="AI Assistant <noreply@aiassistant.local>")

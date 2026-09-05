@@ -15,7 +15,7 @@
     <div class="nav-actions">
       <button type="button" class="nav-toggle" id="landingNavToggle" aria-expanded="false" aria-controls="landingNav" aria-label="Menu">☰</button>
       {% include "partials/lang_switcher.html" %}
-      <a class="btn btn-primary" href="{% url 'accounts:instagram_login' %}">{{ t.nav_connect }}</a>
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">{{ t.nav_connect }}</a>
     </div>
   </div>
 </header>
@@ -31,7 +31,7 @@
       <p class="hero-headline">{{ t.hero_headline }}</p>
       <p class="hero-tag">{{ t.hero_tag }}</p>
       <div class="hero-cta">
-        <a class="btn btn-amber" href="{% url 'accounts:instagram_login' %}">{{ t.hero_cta_primary }}</a>
+        <a class="btn btn-amber" href="{% url 'accounts:register' %}">{{ t.hero_cta_primary }}</a>
         <a class="btn btn-ghost" href="#how">{{ t.hero_cta_secondary }}</a>
       </div>
     </div>
@@ -102,7 +102,7 @@
     {% endfor %}
   </ol>
   <div class="section-cta">
-    <a class="btn btn-primary" href="{% url 'accounts:instagram_login' %}">{{ t.how_cta }}</a>
+    <a class="btn btn-primary" href="{% url 'accounts:register' %}">{{ t.how_cta }}</a>
   </div>
 </section>
 
