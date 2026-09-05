@@ -5,7 +5,7 @@
 <header class="site-nav">
   <div class="site-nav-inner">
     <a href="/" class="brand">AI Assistant</a>
-    <nav class="nav-links">
+    <nav class="nav-links" id="landingNav">
       <a href="#benefits">{{ t.nav_benefits }}</a>
       <a href="#features">{{ t.nav_features }}</a>
       <a href="#industries">{{ t.nav_industries }}</a>
@@ -13,6 +13,7 @@
       <a href="{% url 'accounts:login' %}">{{ t.nav_signin }}</a>
     </nav>
     <div class="nav-actions">
+      <button type="button" class="nav-toggle" id="landingNavToggle" aria-expanded="false" aria-controls="landingNav" aria-label="Menu">☰</button>
       {% include "partials/lang_switcher.html" %}
       <a class="btn btn-primary" href="{% url 'accounts:instagram_login' %}">{{ t.nav_connect }}</a>
     </div>
@@ -117,4 +118,23 @@
     </div>
   </div>
 </footer>
+<script>
+  (function () {
+    const toggle = document.getElementById('landingNavToggle');
+    const nav = document.getElementById('landingNav');
+    if (!toggle || !nav) return;
+    const close = () => {
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+    toggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+    document.addEventListener('click', (e) => {
+      if (!nav.contains(e.target) && !toggle.contains(e.target)) close();
+    });
+  })();
+</script>
 {% endblock %}

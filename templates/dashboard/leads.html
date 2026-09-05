@@ -3,7 +3,8 @@
 {% block content %}
 <h1>{{ t.leads_title }}</h1>
 <p class="muted">{{ t.leads_lead }}</p>
-<div class="panel" style="overflow-x:auto;">
+<div class="panel" style="overflow:hidden;">
+  <div class="table-scroll">
   <table class="table">
     <thead>
       <tr>
@@ -41,5 +42,6 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 {% endblock %}
