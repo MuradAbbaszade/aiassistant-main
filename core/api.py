@@ -68,7 +68,8 @@ def demo_chat(request):
     if conversation is None:
         conversation = Conversation.objects.create(
             business=business,
-            customer_name="Demo Müştəri",
+            customer_name="Demo Customer",
+            external_user_id="SIMULATED_DEMO_CHAT",
             channel="instagram",
             status="ai",
         )

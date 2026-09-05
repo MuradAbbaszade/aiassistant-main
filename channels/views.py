@@ -14,7 +14,7 @@ def _is_real_instagram_thread(conv: Conversation) -> bool:
     uid = (conv.external_user_id or "").strip()
     if not uid or uid.startswith("SIMULATED"):
         return False
-    if conv.customer_name == "Demo Müştəri":
+    if conv.customer_name in ("Demo Müştəri", "Demo Customer"):
         return False
     return uid.isdigit()
 

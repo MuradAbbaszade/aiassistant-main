@@ -221,9 +221,9 @@ STRINGS: dict[str, dict[str, str]] = {
     "home.hot_badge": {"az": "Maraqlı", "en": "Interested", "ru": "Интерес"},
     "conv.title": {"az": "Söhbətlər", "en": "Conversations", "ru": "Диалоги"},
     "conv.lead": {
-        "az": "Müştəri mesajlarını və AI cavablarını burada oxuyun.",
-        "en": "Read customer messages and AI replies here.",
-        "ru": "Читайте сообщения клиентов и ответы ИИ здесь.",
+        "az": "Instagram müştəri söhbətləri — mesajlar və AI cavabları.",
+        "en": "Instagram customer chats — messages and AI replies.",
+        "ru": "Чаты клиентов Instagram — сообщения и ответы ИИ.",
     },
     "conv.empty": {"az": "Söhbət yoxdur.", "en": "No conversations yet.", "ru": "Диалогов пока нет."},
     "conv.pick": {"az": "Söhbət seçin.", "en": "Select a conversation.", "ru": "Выберите диалог."},

@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render
 
 from analytics.services import compute_business_analytics
-from conversations.models import Conversation
+from conversations.queries import customer_conversations
 from core.decorators import demo_login_required
 from knowledge.models import KnowledgeItem
 from leads.models import Lead
@@ -16,7 +16,7 @@ def dashboard(request):
         return render(request, "dashboard/empty.html")
 
     stats = compute_business_analytics(business, getattr(request, "ui_lang", None))
-    conversations = Conversation.objects.filter(business=business)[:6]
+    conversations = customer_conversations(business)[:6]
     leads = Lead.objects.filter(business=business)[:5]
     knowledge_count = KnowledgeItem.objects.filter(business=business).count()
 
