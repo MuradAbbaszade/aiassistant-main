@@ -18,13 +18,40 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY", default="dev-only-ai-assistant-insecure-key-change-me")
 DEBUG = env("DEBUG")
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 # Cloudflare / ngrok tunnels need HTTPS origins listed for POST forms (Knowledge Base, etc.)
 _csrf_origins = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 _public = env("PUBLIC_BASE_URL", default="").strip().rstrip("/")
 if _public and _public not in _csrf_origins:
     _csrf_origins.append(_public)
+# Auto-trust Render / PUBLIC_BASE_URL hosts
+from urllib.parse import urlparse
+
+for _candidate in (
+    _public,
+    env("RENDER_EXTERNAL_URL", default="").strip().rstrip("/"),
+    env("RENDER_EXTERNAL_HOSTNAME", default="").strip(),
+):
+    if not _candidate:
+        continue
+    _host = urlparse(_candidate if "://" in _candidate else f"https://{_candidate}").hostname
+    if _host and _host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_host)
+    if "://" in _candidate or _candidate.startswith("http"):
+        _origin = _candidate
+    elif "." in _candidate:
+        _origin = f"https://{_candidate}"
+    else:
+        continue
+    if _origin.startswith("http") and _origin not in _csrf_origins:
+        _csrf_origins.append(_origin)
+
+# Allow all Render subdomains when running on Render
+if env("RENDER_EXTERNAL_HOSTNAME", default="") or env.bool("RENDER", default=False):
+    if ".onrender.com" not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(".onrender.com")
+
 for _origin in ("http://127.0.0.1:8000", "http://localhost:8000"):
     if _origin not in _csrf_origins:
         _csrf_origins.append(_origin)
