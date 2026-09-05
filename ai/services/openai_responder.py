@@ -58,7 +58,7 @@ def _build_system_prompt(business: Business, settings_obj) -> str:
     hours = business.working_hours or "—"
 
     parts = [
-        f"Sən «{assistant}» — «{business.name}» biznesi üçün Instagram DM AI köməkçisisən.",
+        f"Sən «{assistant}» — «{business.name}» biznesi üçün Instagram DM AI Assistant-sən.",
         f"Biznes tipi: {business.get_type_display() if hasattr(business, 'get_type_display') else business.type}.",
         f"İş saatları: {hours}.",
         f"Xidmət əraziləri: {areas}.",

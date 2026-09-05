@@ -269,7 +269,7 @@ class Command(BaseCommand):
             (
                 KnowledgeType.FAQ,
                 "Salam",
-                "Salam! Dr. Aysel klinikasının AI köməkçisiyəm. Qəbul və xidmətlər barədə yazın.",
+                "Salam! Dr. Aysel klinikasının AI Assistant-ıyam. Qəbul və xidmətlər barədə yazın.",
                 ["salam", "xoş gəlmisiniz"],
             ),
         ]:

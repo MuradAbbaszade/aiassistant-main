@@ -1,4 +1,4 @@
-# AI Köməkçi
+# AI Assistant
 
 Interactive multi-tenant SaaS demo: an Azerbaijani AI customer assistant for Instagram / WhatsApp / website.
 
@@ -26,7 +26,7 @@ python manage.py runserver
 
 Open http://127.0.0.1:8000/
 
-- Login: `demo@aikomekci.az` (any password)
+- Login: `demo@aiassistant.local` (any password)
 - Default tenant: `abc-construction`
 
 ## Architecture

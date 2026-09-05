@@ -15,7 +15,7 @@ env = environ.Env(
 
 environ.Env.read_env(BASE_DIR / ".env")
 
-SECRET_KEY = env("SECRET_KEY", default="dev-only-ai-komekci-insecure-key-change-me")
+SECRET_KEY = env("SECRET_KEY", default="dev-only-ai-assistant-insecure-key-change-me")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
@@ -124,7 +124,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DEFAULT_BUSINESS_ID = ""
 DEMO_LOGIN_EMAIL = ""
 
-AI_PROVIDER = env("AI_PROVIDER")
+AI_PROVIDER = env("AI_PROVIDER", default="mock")
 OPENAI_API_KEY = env("OPENAI_API_KEY", default="")
 OPENAI_MODEL = env("OPENAI_MODEL", default="gpt-4o-mini")
 

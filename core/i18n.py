@@ -15,7 +15,7 @@ LANG_LABELS = {
 # Flat keys → {az, en, ru}
 STRINGS: dict[str, dict[str, str]] = {
     "meta.title_landing": {
-        "az": "AI Assistant — Instagram AI müştəri köməkçisi",
+        "az": "AI Assistant — Instagram AI müştəri asistentı",
         "en": "AI Assistant — Instagram customer messaging",
         "ru": "AI Assistant — AI-помощник для Instagram",
     },

@@ -1,4 +1,4 @@
-# Real Instagram OAuth + Messaging (AI Köməkçi)
+# Real Instagram OAuth + Messaging (AI Assistant)
 
 ## Customer flow (no passwords)
 

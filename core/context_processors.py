@@ -9,7 +9,7 @@ def tenant(request):
         "current_business": getattr(request, "current_business", None),
         "all_businesses": businesses,
         "is_demo_logged_in": bool(request.session.get("demo_logged_in")),
-        "demo_user_email": request.session.get("demo_user_email", "demo@aikomekci.az"),
+        "demo_user_email": request.session.get("demo_user_email", "demo@aiassistant.local"),
         "demo_user_name": request.session.get("demo_user_name", "Demo Account"),
         "ui_lang": lang,
         "t": template_strings(lang),

@@ -497,7 +497,7 @@ class MockRAGResponder:
             return top.content.strip(), min(0.55 + scored[0].score / 20.0, 0.92)
         name = business.name
         return (
-            f"Salam! {name} üçün AI köməkçisiyəm. Sualınızı bir az ətraflı yazın, "
+            f"Salam! {name} üçün AI Assistant-əm. Sualınızı bir az ətraflı yazın, "
             "Knowledge Base-ə əsasən cavab verəcəyəm.",
             0.55,
         )

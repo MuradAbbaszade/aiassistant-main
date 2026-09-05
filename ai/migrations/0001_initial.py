@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "assistant_name",
-                    models.CharField(default="AI Köməkçi", max_length=100),
+                    models.CharField(default="AI Assistant", max_length=100),
                 ),
                 (
                     "language",
