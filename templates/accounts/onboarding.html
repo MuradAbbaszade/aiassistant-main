@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Onboarding — AI Assistant{% endblock %}
+{% block title %}Başlanğıc — AI Assistant{% endblock %}
 {% block body_class %}landing-body{% endblock %}
 {% block body %}
 <header class="site-nav">
@@ -9,8 +9,8 @@
   </div>
 </header>
 <section class="section">
-  <h1>Onboarding yoxlama siyahısı</h1>
-  <p class="section-lead">Demo üçün 5 addımlıq hazırlıq. Bəzi addımlar seed data ilə artıq tamamlanıb.</p>
+  <h1>Başlamaq üçün addımlar</h1>
+  <p class="section-lead">Bir neçə dəqiqəyə AI-nizi hazırlayın. Hər addımı bitirəndə işarə avtomatik yenilənir.</p>
   <ol class="steps">
     {% for s in steps %}
     <li>
@@ -22,10 +22,11 @@
     </li>
     {% endfor %}
   </ol>
-        <div style="display:flex;gap:0.6rem;margin-top:1.5rem;flex-wrap:wrap;">
-          <a class="btn btn-primary" href="{% url 'knowledge:list' %}">Knowledge Base aç</a>
-          <a class="btn btn-ghost" href="{% url 'channels:list' %}">Kanallar / Webhook</a>
-          <a class="btn btn-ghost" href="{% url 'analytics:dashboard' %}">Dashboard</a>
-        </div>
+  <div style="display:flex;gap:0.6rem;margin-top:1.5rem;flex-wrap:wrap;">
+    <a class="btn btn-primary" href="{% url 'knowledge:list' %}">Biznes məlumatları</a>
+    <a class="btn btn-ghost" href="{% url 'ai:settings' %}">AI üslubu</a>
+    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">Söhbətlər</a>
+    <a class="btn btn-ghost" href="{% url 'analytics:dashboard' %}">Dashboard</a>
+  </div>
 </section>
 {% endblock %}

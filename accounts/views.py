@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
+from ai.models import AISettings
+from channels.models import Channel, ChannelStatus
 from channels.services.oauth import (
     build_authorize_url,
     complete_oauth,
@@ -9,6 +11,8 @@ from channels.services.oauth import (
     new_oauth_state,
     upsert_business_from_oauth,
 )
+from conversations.models import Conversation
+from knowledge.models import KnowledgeItem
 
 
 def login_view(request):
@@ -75,7 +79,7 @@ def instagram_callback(request):
     if created:
         messages.success(
             request,
-            f"@{result.username} qoşuldu. Knowledge Base doldurun — AI Instagram DM-lərə cavab verəcək.",
+            f"@{result.username} qoşuldu. Biznes məlumatlarınızı yazın — AI Instagram DM-lərə cavab verəcək.",
         )
         return redirect("accounts:onboarding")
     messages.success(request, f"@{result.username} hesabına daxil oldunuz.")
@@ -90,31 +94,49 @@ def logout_view(request):
 def onboarding_view(request):
     if not request.session.get("demo_logged_in"):
         return redirect("accounts:login")
+
+    business = getattr(request, "current_business", None)
+    ig_connected = False
+    kb_ready = False
+    ai_ready = False
+    has_messages = False
+
+    if business:
+        ig_connected = Channel.objects.filter(
+            business=business,
+            type="instagram",
+            status__in=[ChannelStatus.LIVE, ChannelStatus.CONNECTED],
+        ).exclude(access_token="").exists()
+        kb_ready = KnowledgeItem.objects.filter(business=business).exists()
+        ai = AISettings.objects.filter(business=business).first()
+        ai_ready = bool(ai and (ai.rules or "").strip())
+        has_messages = Conversation.objects.filter(business=business).exists()
+
     steps = [
         {
             "title": "Instagram qoşuldu",
-            "desc": "Hesabınız OAuth ilə bağlandı — mesaj göndərmə icazəsi alındı.",
-            "done": True,
+            "desc": "Biznes hesabınız bağlandı — AI mesajlara cavab verə bilər.",
+            "done": ig_connected,
         },
         {
-            "title": "Knowledge Base",
-            "desc": "Xidmətlər, qiymət və FAQ əlavə edin ki, AI düzgün cavab versin.",
-            "done": False,
+            "title": "Biznes məlumatlarınızı yazın",
+            "desc": "Qiymət, xidmətlər və tez-tez verilən sualları əlavə edin ki, AI düzgün cavab versin.",
+            "done": kb_ready,
         },
         {
-            "title": "AI Settings",
-            "desc": "Ton, dil və qaydaları tənzimləyin.",
-            "done": False,
+            "title": "AI üslubunu seçin",
+            "desc": "Dil, ton və cavab qaydalarını öz biznesinizə uyğunlaşdırın.",
+            "done": ai_ready,
         },
         {
-            "title": "Webhook",
-            "desc": "Meta App-də /webhooks/instagram/ URL-ini yoxlayın (bir dəfəlik platform setup).",
-            "done": False,
+            "title": "Test mesajı göndərin",
+            "desc": "Başqa bir Instagram hesabından öz biznes profilinizə sadə bir sual yazın.",
+            "done": has_messages,
         },
         {
-            "title": "Test DM",
-            "desc": "Başqa IG hesabından öz biznes profilinizə yazın.",
-            "done": False,
+            "title": "Cavabı panelda görün",
+            "desc": "Söhbətlər bölməsində müştəri mesajını və AI cavabını izləyin.",
+            "done": has_messages,
         },
     ]
     return render(request, "accounts/onboarding.html", {"steps": steps})

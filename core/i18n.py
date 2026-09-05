@@ -146,14 +146,14 @@ STRINGS: dict[str, dict[str, str]] = {
         "ru": "Заполните базу знаний",
     },
     "how.4": {
-        "az": "Meta webhook-u təsdiqləyin",
-        "en": "Confirm the Meta webhook",
-        "ru": "Подтвердите Meta webhook",
+        "az": "Başqa hesaba test mesajı yazın",
+        "en": "Send a test message from another account",
+        "ru": "Отправьте тестовое сообщение с другого аккаунта",
     },
     "how.5": {
-        "az": "Mövzuya aid müştəri DM-lərinə AI cavab versin",
-        "en": "Let AI answer on-topic customer DMs",
-        "ru": "Пусть ИИ отвечает на релевантные DM",
+        "az": "AI müştəri suallarına avtomatik cavab versin",
+        "en": "Let AI answer customer questions automatically",
+        "ru": "Пусть ИИ автоматически отвечает клиентам",
     },
     "how.cta": {"az": "Instagram ilə başla", "en": "Start with Instagram", "ru": "Начать с Instagram"},
     "footer.blurb": {
