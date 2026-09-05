@@ -1,8 +1,8 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}Söhbətlər{% endblock %}
+{% block page_title %}{{ t.conv_title }}{% endblock %}
 {% block content %}
-<h1>Söhbətlər</h1>
-<p class="muted">Oxumaq üçün master-detail inbox (demo).</p>
+<h1>{{ t.conv_title }}</h1>
+<p class="muted">{{ t.conv_lead }}</p>
 <div class="inbox panel" style="padding:0;overflow:hidden;">
   <div class="inbox-list" style="border-right:1px solid var(--line);max-height:560px;overflow:auto;">
     {% for c in conversations %}
@@ -10,11 +10,11 @@
       <button type="button" class="{% if selected and selected.id == c.id %}active{% endif %}">
         <strong>{{ c.customer_name }}</strong>
         <div class="muted" style="font-size:0.82rem;">{{ c.channel }} · {{ c.status }}</div>
-        {% if c.lead_potential %}<span class="badge badge-hot">🔥</span>{% endif %}
+        {% if c.lead_potential %}<span class="badge badge-hot">🔥 {{ t.home_hot_badge }}</span>{% endif %}
       </button>
     </a>
     {% empty %}
-    <p class="muted" style="padding:1rem;">Söhbət yoxdur.</p>
+    <p class="muted" style="padding:1rem;">{{ t.conv_empty }}</p>
     {% endfor %}
   </div>
   <div style="padding:1rem;">
@@ -31,7 +31,7 @@
       {% endfor %}
     </div>
     {% else %}
-    <p class="muted">Söhbət seçin.</p>
+    <p class="muted">{{ t.conv_pick }}</p>
     {% endif %}
   </div>
 </div>

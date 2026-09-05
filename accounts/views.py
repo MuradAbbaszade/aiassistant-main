@@ -12,6 +12,7 @@ from channels.services.oauth import (
     upsert_business_from_oauth,
 )
 from conversations.models import Conversation
+from core.i18n import get_translator
 from knowledge.models import KnowledgeItem
 
 
@@ -112,31 +113,12 @@ def onboarding_view(request):
         ai_ready = bool(ai and (ai.rules or "").strip())
         has_messages = Conversation.objects.filter(business=business).exists()
 
+    tr = get_translator(getattr(request, "ui_lang", None))
     steps = [
-        {
-            "title": "Instagram qoşuldu",
-            "desc": "Biznes hesabınız bağlandı — AI mesajlara cavab verə bilər.",
-            "done": ig_connected,
-        },
-        {
-            "title": "Biznes məlumatlarınızı yazın",
-            "desc": "Qiymət, xidmətlər və tez-tez verilən sualları əlavə edin ki, AI düzgün cavab versin.",
-            "done": kb_ready,
-        },
-        {
-            "title": "AI üslubunu seçin",
-            "desc": "Dil, ton və cavab qaydalarını öz biznesinizə uyğunlaşdırın.",
-            "done": ai_ready,
-        },
-        {
-            "title": "Test mesajı göndərin",
-            "desc": "Başqa bir Instagram hesabından öz biznes profilinizə sadə bir sual yazın.",
-            "done": has_messages,
-        },
-        {
-            "title": "Cavabı panelda görün",
-            "desc": "Söhbətlər bölməsində müştəri mesajını və AI cavabını izləyin.",
-            "done": has_messages,
-        },
+        {"title": tr["onb.s1"], "desc": tr["onb.s1d"], "done": ig_connected},
+        {"title": tr["onb.s2"], "desc": tr["onb.s2d"], "done": kb_ready},
+        {"title": tr["onb.s3"], "desc": tr["onb.s3d"], "done": ai_ready},
+        {"title": tr["onb.s4"], "desc": tr["onb.s4d"], "done": has_messages},
+        {"title": tr["onb.s5"], "desc": tr["onb.s5d"], "done": has_messages},
     ]
     return render(request, "accounts/onboarding.html", {"steps": steps})

@@ -1,48 +1,48 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}Bağlantı{% endblock %}
+{% block page_title %}{{ t.ch_title }}{% endblock %}
 {% block content %}
-<h1>Instagram bağlantısı</h1>
-<p class="muted">Hesabınızı idarə edin və gələn müştəri mesajlarına baxın.</p>
+<h1>{{ t.ch_title }}</h1>
+<p class="muted">{{ t.ch_lead }}</p>
 
 <div class="panel" style="margin-bottom:1.25rem;">
-  <h2 style="margin-top:0;">Sizin hesabınız</h2>
+  <h2 style="margin-top:0;">{{ t.ch_your_account }}</h2>
   {% if ig_channel and ig_channel.is_live %}
   <p>
-    <span class="badge badge-ok">Qoşulub</span>
+    <span class="badge badge-ok">{{ t.ch_connected }}</span>
     <strong>{{ ig_channel.handle }}</strong>
   </p>
-  <p class="muted">AI Instagram mesajlarınıza avtomatik cavab verə bilər.</p>
+  <p class="muted">{{ t.ch_can_reply }}</p>
   {% if ig_channel.last_error %}
-  <p class="form-error" style="margin-top:0.75rem;">Bağlantıda problem var. Yenidən qoşulun və ya dəstəyə yazın.</p>
+  <p class="form-error" style="margin-top:0.75rem;">{{ t.ch_error }}</p>
   {% endif %}
   <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;">
-    <a class="btn btn-ghost" href="{% url 'accounts:instagram_login' %}">Yenidən qoşul</a>
+    <a class="btn btn-ghost" href="{% url 'accounts:instagram_login' %}">{{ t.ch_reconnect }}</a>
     <form method="post" action="{% url 'channels:instagram_resubscribe' %}">{% csrf_token %}
-      <button class="btn btn-ghost" type="submit">Mesaj qəbulunu yenilə</button>
+      <button class="btn btn-ghost" type="submit">{{ t.ch_refresh }}</button>
     </form>
     <form method="post" action="{% url 'channels:instagram_disconnect' %}">{% csrf_token %}
-      <button class="btn btn-ghost" type="submit">Bağlantını kəs</button>
+      <button class="btn btn-ghost" type="submit">{{ t.ch_disconnect }}</button>
     </form>
   </div>
   {% else %}
-  <p><span class="badge badge-warn">Qoşulmayıb</span></p>
-  <p class="muted">Instagram biznes hesabınızı qoşun ki, AI mesajlara cavab versin.</p>
-  <a class="btn btn-primary" style="margin-top:0.75rem;" href="{% url 'accounts:instagram_login' %}">Instagram ilə qoşul</a>
+  <p><span class="badge badge-warn">{{ t.ch_disconnected }}</span></p>
+  <p class="muted">{{ t.ch_connect_hint }}</p>
+  <a class="btn btn-primary" style="margin-top:0.75rem;" href="{% url 'accounts:instagram_login' %}">{{ t.ch_connect }}</a>
   {% endif %}
 </div>
 
 <div class="panel" style="margin-bottom:1.25rem;">
-  <h2 style="margin-top:0;">Son mesajlar</h2>
+  <h2 style="margin-top:0;">{{ t.ch_recent }}</h2>
   {% if real_messages %}
-  <p class="muted">Instagram-dan gələn son söhbətlər.</p>
+  <p class="muted">{{ t.ch_recent_lead }}</p>
   <div style="max-height:420px;overflow:auto;">
     <table class="table">
       <thead>
         <tr>
-          <th>Vaxt</th>
-          <th>Müştəri</th>
-          <th>Kim</th>
-          <th>Mesaj</th>
+          <th>{{ t.ch_col_time }}</th>
+          <th>{{ t.ch_col_customer }}</th>
+          <th>{{ t.ch_col_who }}</th>
+          <th>{{ t.ch_col_msg }}</th>
         </tr>
       </thead>
       <tbody>
@@ -51,7 +51,7 @@
           <td class="muted" style="white-space:nowrap;font-size:0.85rem;">{{ m.timestamp|date:"d.m H:i" }}</td>
           <td><strong>{{ m.conversation.customer_name }}</strong></td>
           <td>
-            {% if m.sender == 'customer' %}<span class="badge">Müştəri</span>
+            {% if m.sender == 'customer' %}<span class="badge">{{ t.ch_badge_customer }}</span>
             {% elif m.sender == 'ai' %}<span class="badge badge-ok">AI</span>
             {% else %}<span class="badge">{{ m.sender }}</span>{% endif %}
           </td>
@@ -62,21 +62,22 @@
     </table>
   </div>
   <p style="margin-top:0.75rem;">
-    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">Bütün söhbətlər</a>
-    <a class="btn btn-ghost" href="{% url 'channels:list' %}">Yenilə</a>
+    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">{{ t.ch_all_convos }}</a>
+    <a class="btn btn-ghost" href="{% url 'channels:list' %}">{{ t.ch_refresh_page }}</a>
   </p>
   {% else %}
   <p class="muted" style="margin-bottom:0.75rem;">
-    Hələ mesaj yoxdur. Başqa bir Instagram hesabından <strong>{{ ig_channel.handle|default:"biznes profilinizə" }}</strong> yazın — cavab burada görünəcək.
+    {{ t.ch_empty }}
+    {% if ig_channel.handle %}<strong>{{ ig_channel.handle }}</strong>{% endif %}
   </p>
   <ol class="muted" style="margin:0;padding-left:1.2rem;font-size:0.9rem;">
-    <li>Başqa hesaba keçin (öz hesabınıza özünüzdən yazmaq olmur)</li>
-    <li>Biznes profilinizə sadə bir sual göndərin</li>
-    <li>Bu səhifəni yeniləyin və ya Söhbətlər bölməsinə baxın</li>
+    <li>{{ t.ch_tip1 }}</li>
+    <li>{{ t.ch_tip2 }}</li>
+    <li>{{ t.ch_tip3 }}</li>
   </ol>
   <p style="margin-top:0.75rem;">
-    <a class="btn btn-ghost" href="{% url 'channels:list' %}">Yenilə</a>
-    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">Söhbətlər</a>
+    <a class="btn btn-ghost" href="{% url 'channels:list' %}">{{ t.ch_refresh_page }}</a>
+    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">{{ t.ch_all_convos }}</a>
   </p>
   {% endif %}
 </div>
@@ -86,10 +87,10 @@
   <div class="panel">
     <h2 style="margin-top:0;">{{ ch.get_type_display }}</h2>
     {% if ch.status == 'coming_soon' %}
-    <span class="badge badge-warn">Tezliklə</span>
-    <p class="muted" style="margin-top:0.5rem;">Bu kanal tezliklə əlavə olunacaq.</p>
+    <span class="badge badge-warn">{{ t.ch_soon }}</span>
+    <p class="muted" style="margin-top:0.5rem;">{{ t.ch_coming }}</p>
     {% else %}
-    <span class="badge">Qoşulmayıb</span>
+    <span class="badge">{{ t.ch_disconnected }}</span>
     {% endif %}
   </div>
   {% endfor %}

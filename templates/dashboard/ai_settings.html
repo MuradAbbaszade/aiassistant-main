@@ -1,36 +1,36 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}AI Settings{% endblock %}
+{% block page_title %}{{ t.ai_title }}{% endblock %}
 {% block content %}
-<h1>AI Settings</h1>
-<p class="muted">{{ current_business.name }} üçün asistent davranışı.</p>
+<h1>{{ t.ai_title }}</h1>
+<p class="muted">{{ current_business.name }} {{ t.ai_lead }}</p>
 <div class="panel" style="max-width:720px;">
   <form method="post">
     {% csrf_token %}
-    <label>Asistent adı</label>
+    <label>{{ t.ai_name }}</label>
     <input name="assistant_name" value="{{ ai_settings.assistant_name }}">
-    <label style="margin-top:0.75rem;display:block;">Dil</label>
+    <label style="margin-top:0.75rem;display:block;">{{ t.ai_language }}</label>
     <select name="language">
-      {% for val, label in language_choices.choices %}
+      {% for val, label in language_choices %}
       <option value="{{ val }}" {% if ai_settings.language == val %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
-    <label style="margin-top:0.75rem;display:block;">Ton</label>
+    <label style="margin-top:0.75rem;display:block;">{{ t.ai_tone }}</label>
     <select name="tone">
-      {% for val, label in tone_choices.choices %}
+      {% for val, label in tone_choices %}
       <option value="{{ val }}" {% if ai_settings.tone == val %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
-    <label style="margin-top:0.75rem;display:block;">Cavab uzunluğu</label>
+    <label style="margin-top:0.75rem;display:block;">{{ t.ai_length }}</label>
     <select name="response_length">
-      {% for val, label in length_choices.choices %}
+      {% for val, label in length_choices %}
       <option value="{{ val }}" {% if ai_settings.response_length == val %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
-    <label style="margin-top:0.75rem;display:block;">Biznes tipi</label>
+    <label style="margin-top:0.75rem;display:block;">{{ t.ai_biz_type }}</label>
     <input value="{{ current_business.get_type_display }}" disabled>
-    <label style="margin-top:0.75rem;display:block;">Qaydalar</label>
+    <label style="margin-top:0.75rem;display:block;">{{ t.ai_rules }}</label>
     <textarea name="rules" rows="6">{{ ai_settings.rules }}</textarea>
-    <button class="btn btn-primary" style="margin-top:1rem;" type="submit">Saxla</button>
+    <button class="btn btn-primary" style="margin-top:1rem;" type="submit">{{ t.ai_save }}</button>
   </form>
 </div>
 {% endblock %}

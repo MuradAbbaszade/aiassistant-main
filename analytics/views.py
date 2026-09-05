@@ -2,7 +2,7 @@ import json
 
 from django.shortcuts import render
 
-from analytics.models import AnalyticsSnapshot
+from analytics.services import compute_business_analytics
 from conversations.models import Conversation
 from core.decorators import demo_login_required
 from knowledge.models import KnowledgeItem
@@ -15,17 +15,17 @@ def dashboard(request):
     if not business:
         return render(request, "dashboard/empty.html")
 
-    snap = AnalyticsSnapshot.objects.filter(business=business).order_by("-date").first()
+    stats = compute_business_analytics(business, getattr(request, "ui_lang", None))
     conversations = Conversation.objects.filter(business=business)[:6]
     leads = Lead.objects.filter(business=business)[:5]
     knowledge_count = KnowledgeItem.objects.filter(business=business).count()
 
     kpis = {
-        "messages_today": snap.messages_today if snap else 0,
-        "ai_answered": snap.ai_answered if snap else 0,
-        "human_takeover": snap.human_takeover if snap else 0,
-        "new_leads": snap.new_leads if snap else Lead.objects.filter(business=business).count(),
-        "response_rate": int((snap.response_rate if snap else 0) * 100),
+        "messages_today": stats["messages_today"],
+        "ai_answered": stats["ai_answered"],
+        "human_takeover": stats["human_takeover"],
+        "new_leads": stats["new_leads"],
+        "response_rate": int(stats["response_rate"] * 100),
         "knowledge_count": knowledge_count,
     }
     return render(
@@ -43,19 +43,19 @@ def dashboard(request):
 @demo_login_required
 def analytics_page(request):
     business = request.current_business
-    snap = AnalyticsSnapshot.objects.filter(business=business).order_by("-date").first()
-    funnel = snap.lead_funnel if snap else {}
-    series = snap.messages_per_day if snap else []
-    ai_vs = snap.ai_vs_human if snap else {"ai": 0, "human": 0}
+    if not business:
+        return render(request, "dashboard/empty.html")
+
+    stats = compute_business_analytics(business, getattr(request, "ui_lang", None))
     return render(
         request,
         "dashboard/analytics.html",
         {
-            "snap": snap,
-            "funnel_json": json.dumps(funnel),
-            "series_json": json.dumps(series),
-            "ai_vs_json": json.dumps(ai_vs),
-            "response_rate_pct": int((snap.response_rate if snap else 0) * 100),
+            "stats": stats,
+            "funnel_json": json.dumps(stats["lead_funnel"]),
+            "series_json": json.dumps(stats["messages_per_day"]),
+            "ai_vs_json": json.dumps(stats["ai_vs_human"]),
+            "response_rate_pct": int(stats["response_rate"] * 100),
             "active_nav": "analytics",
         },
     )

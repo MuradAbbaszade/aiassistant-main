@@ -13,7 +13,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from ai.services.responder import get_responder
-from analytics.models import AnalyticsSnapshot
 from businesses.models import Business
 from channels.models import Channel, ChannelStatus, ChannelType
 from conversations.models import Conversation, Message, MessageLabel, MessageSender
@@ -266,32 +265,20 @@ def instagram_connect_api(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def analytics_api(request):
+    from analytics.services import compute_business_analytics
+
     business = _require_business(request, request.query_params.get("business_id"))
-    snap = AnalyticsSnapshot.objects.filter(business=business).order_by("-date").first()
-    if not snap:
-        return Response(
-            {
-                "messages_today": 0,
-                "ai_answered": 0,
-                "human_takeover": 0,
-                "new_leads": 0,
-                "response_rate": 0,
-                "messages_per_day": [],
-                "ai_vs_human": {},
-                "lead_funnel": {},
-            }
-        )
+    stats = compute_business_analytics(business)
     return Response(
         {
-            "date": snap.date.isoformat(),
-            "messages_today": snap.messages_today,
-            "ai_answered": snap.ai_answered,
-            "human_takeover": snap.human_takeover,
-            "new_leads": snap.new_leads,
-            "response_rate": snap.response_rate,
-            "messages_per_day": snap.messages_per_day,
-            "ai_vs_human": snap.ai_vs_human,
-            "lead_funnel": snap.lead_funnel,
+            "messages_today": stats["messages_today"],
+            "ai_answered": stats["ai_answered"],
+            "human_takeover": stats["human_takeover"],
+            "new_leads": stats["new_leads"],
+            "response_rate": stats["response_rate"],
+            "messages_per_day": stats["messages_per_day"],
+            "ai_vs_human": stats["ai_vs_human"],
+            "lead_funnel": stats["lead_funnel"],
         }
     )
 

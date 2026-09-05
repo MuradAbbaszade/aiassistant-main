@@ -1,38 +1,38 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}Knowledge Base{% endblock %}
+{% block page_title %}{{ t.kb_title }}{% endblock %}
 {% block content %}
-<h1>Knowledge Base</h1>
-<p class="muted">Dəyişikliklər dərhal AI cavablarına təsir edir (eyni DB).</p>
+<h1>{{ t.kb_title }}</h1>
+<p class="muted">{{ t.kb_lead }}</p>
 
 <div class="panel" style="margin-bottom:1.25rem;">
-  <h2>Yeni element</h2>
+  <h2>{{ t.kb_new }}</h2>
   <form method="post" action="{% url 'knowledge:create' %}">
     {% csrf_token %}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;">
       <div>
-        <label>Tip</label>
+        <label>{{ t.kb_type }}</label>
         <select name="type">
-          {% for val, label in types.choices %}
+          {% for val, label in type_choices %}
           <option value="{{ val }}">{{ label }}</option>
           {% endfor %}
         </select>
       </div>
       <div>
-        <label>Başlıq</label>
-        <input name="title" required placeholder="Məs: Ev tikintisi">
+        <label>{{ t.kb_item_title }}</label>
+        <input name="title" required placeholder="{{ t.kb_title_ph }}">
       </div>
       <div>
-        <label>Keywords (vergüllə)</label>
-        <input name="keywords" placeholder="qiymət, m2, bakı">
+        <label>{{ t.kb_keywords }}</label>
+        <input name="keywords" placeholder="{{ t.kb_kw_ph }}">
       </div>
     </div>
-    <label style="display:block;margin-top:0.75rem;">Məzmun</label>
+    <label style="display:block;margin-top:0.75rem;">{{ t.kb_content }}</label>
     <textarea name="content" rows="3" required></textarea>
-    <button class="btn btn-primary" style="margin-top:0.75rem;" type="submit">Əlavə et</button>
+    <button class="btn btn-primary" style="margin-top:0.75rem;" type="submit">{{ t.kb_add }}</button>
   </form>
 </div>
 
-{% for type_key, items in by_type.items %}
+{% for type_key, items in by_type_labeled %}
 {% if items %}
 <div class="panel kb-section">
   <h2>{{ type_key }}</h2>
@@ -40,23 +40,23 @@
   <details class="kb-item">
     <summary>{{ item.title }} <span class="muted" style="font-weight:500;">· {{ item.updated_at|date:"d.m.Y H:i" }}</span></summary>
     <p>{{ item.content }}</p>
-    <p class="muted" style="font-size:0.85rem;">Keywords: {{ item.keywords|join:", " }}</p>
+    <p class="muted" style="font-size:0.85rem;">{{ t.kb_keywords }}: {{ item.keywords|join:", " }}</p>
     <form method="post" action="{% url 'knowledge:update' item.id %}" style="margin-top:0.75rem;">
       {% csrf_token %}
       <input type="hidden" name="type" value="{{ item.type }}">
-      <label>Başlıq</label>
+      <label>{{ t.kb_item_title }}</label>
       <input name="title" value="{{ item.title }}">
-      <label>Məzmun</label>
+      <label>{{ t.kb_content }}</label>
       <textarea name="content" rows="3">{{ item.content }}</textarea>
-      <label>Keywords</label>
+      <label>{{ t.kb_keywords }}</label>
       <input name="keywords" value="{{ item.keywords|join:', ' }}">
       <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
-        <button class="btn btn-primary" type="submit">Saxla</button>
+        <button class="btn btn-primary" type="submit">{{ t.kb_save }}</button>
       </div>
     </form>
-    <form method="post" action="{% url 'knowledge:delete' item.id %}" style="margin-top:0.4rem;" onsubmit="return confirm('Silinsin?');">
+    <form method="post" action="{% url 'knowledge:delete' item.id %}" style="margin-top:0.4rem;" onsubmit="return confirm('{{ t.kb_confirm_delete|escapejs }}');">
       {% csrf_token %}
-      <button class="btn btn-ghost" type="submit">Sil</button>
+      <button class="btn btn-ghost" type="submit">{{ t.kb_delete }}</button>
     </form>
   </details>
   {% endfor %}

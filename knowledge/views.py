@@ -3,22 +3,27 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from core.decorators import demo_login_required
+from core.i18n import localized_choice_pairs
 from knowledge.models import KnowledgeItem, KnowledgeType
 
 
 @demo_login_required
 def knowledge_list(request):
     business = request.current_business
+    lang = getattr(request, "ui_lang", None)
     items = KnowledgeItem.objects.filter(business=business)
     by_type = {t.value: [] for t in KnowledgeType}
     for item in items:
         by_type.setdefault(item.type, []).append(item)
+    type_choices = localized_choice_pairs(lang, "kb.type", [t.value for t in KnowledgeType])
+    label_by_type = dict(type_choices)
+    by_type_labeled = [(label_by_type.get(k, k), v) for k, v in by_type.items()]
     return render(
         request,
         "dashboard/knowledge.html",
         {
-            "by_type": by_type,
-            "types": KnowledgeType,
+            "by_type_labeled": by_type_labeled,
+            "type_choices": type_choices,
             "active_nav": "knowledge",
         },
     )

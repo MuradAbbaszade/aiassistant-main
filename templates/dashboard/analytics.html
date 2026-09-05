@@ -1,33 +1,35 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}Analitika{% endblock %}
+{% block page_title %}{{ t.an_title }}{% endblock %}
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 {% endblock %}
 {% block content %}
-<h1>Analitika</h1>
-<p class="muted">{{ current_business.name }} metrikaları</p>
+<h1>{{ t.an_title }}</h1>
+<p class="muted">{{ current_business.name }} — {{ t.an_lead }}</p>
 
-{% if snap %}
 <div class="kpi-grid">
-  <div class="kpi"><div class="val">{{ snap.messages_today }}</div><div class="lbl">Mesajlar</div></div>
-  <div class="kpi"><div class="val">{{ snap.ai_answered }}</div><div class="lbl">AI cavab</div></div>
-  <div class="kpi"><div class="val">{{ snap.human_takeover }}</div><div class="lbl">İnsan</div></div>
-  <div class="kpi"><div class="val">{{ snap.new_leads }}</div><div class="lbl">Yeni lead</div></div>
-  <div class="kpi"><div class="val">{{ response_rate_pct }}%</div><div class="lbl">Cavab nisbəti</div></div>
+  <div class="kpi"><div class="val">{{ stats.messages_today }}</div><div class="lbl">{{ t.an_kpi_messages }}</div></div>
+  <div class="kpi"><div class="val">{{ stats.ai_answered }}</div><div class="lbl">{{ t.an_kpi_ai }}</div></div>
+  <div class="kpi"><div class="val">{{ stats.human_takeover }}</div><div class="lbl">{{ t.an_kpi_human }}</div></div>
+  <div class="kpi"><div class="val">{{ stats.new_leads }}</div><div class="lbl">{{ t.an_kpi_leads }}</div></div>
+  <div class="kpi"><div class="val">{{ response_rate_pct }}%</div><div class="lbl">{{ t.an_kpi_rate }}</div></div>
 </div>
+
+{% if not stats.has_data %}
+<p class="muted" style="margin-bottom:1rem;">{{ t.an_empty }}</p>
 {% endif %}
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
   <div class="panel">
-    <h2>Mesajlar / gün</h2>
+    <h2>{{ t.an_chart_msgs }}</h2>
     <canvas id="messagesChart" height="180"></canvas>
   </div>
   <div class="panel">
-    <h2>AI vs İnsan</h2>
+    <h2>{{ t.an_chart_ai }}</h2>
     <canvas id="aiHumanChart" height="180"></canvas>
   </div>
   <div class="panel">
-    <h2>Lead funnel</h2>
+    <h2>{{ t.an_chart_funnel }}</h2>
     <canvas id="funnelChart" height="180"></canvas>
   </div>
 </div>
@@ -37,34 +39,69 @@
   const series = {{ series_json|safe }};
   const aiVs = {{ ai_vs_json|safe }};
   const funnel = {{ funnel_json|safe }};
+  const i18n = {
+    messages: "{{ t.an_msg_label|escapejs }}",
+    ai: "{{ t.an_ai_label|escapejs }}",
+    human: "{{ t.an_human_label|escapejs }}",
+    noData: "{{ t.an_no_data_tip|escapejs }}",
+    count: "{{ t.an_count|escapejs }}",
+  };
 
-  const msgLabels = (series || []).map(x => x.date);
+  const msgLabels = (series || []).map(x => {
+    const parts = (x.date || '').split('-');
+    return parts.length === 3 ? `${parts[2]}.${parts[1]}` : x.date;
+  });
   const msgData = (series || []).map(x => x.count);
+
+  const cyan = '#00D9FF';
+  const violet = '#8A3FFC';
+  const silver = '#94A3B8';
 
   new Chart(document.getElementById('messagesChart'), {
     type: 'line',
     data: {
       labels: msgLabels,
       datasets: [{
-        label: 'Mesajlar',
+        label: i18n.messages,
         data: msgData,
-        borderColor: '#0d6e6e',
-        backgroundColor: 'rgba(13,110,110,0.15)',
+        borderColor: cyan,
+        backgroundColor: 'rgba(0,217,255,0.15)',
         tension: 0.35,
         fill: true,
       }]
     },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: silver }, grid: { color: 'rgba(148,163,184,0.15)' } },
+        x: { ticks: { color: silver }, grid: { display: false } },
+      }
+    }
   });
 
+  const aiCount = aiVs.ai || 0;
+  const humanCount = aiVs.human || 0;
   new Chart(document.getElementById('aiHumanChart'), {
     type: 'doughnut',
     data: {
-      labels: ['AI', 'İnsan'],
+      labels: [i18n.ai, i18n.human],
       datasets: [{
-        data: [aiVs.ai || 0, aiVs.human || 0],
-        backgroundColor: ['#0d6e6e', '#c45c26'],
+        data: (aiCount + humanCount) > 0 ? [aiCount, humanCount] : [1, 0],
+        backgroundColor: [cyan, violet],
       }]
+    },
+    options: {
+      plugins: {
+        legend: { labels: { color: silver } },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              if ((aiCount + humanCount) === 0) return i18n.noData;
+              return `${ctx.label}: ${ctx.raw}`;
+            }
+          }
+        }
+      }
     }
   });
 
@@ -74,12 +111,18 @@
     data: {
       labels: funnelKeys,
       datasets: [{
-        label: 'Lead-lər',
+        label: i18n.count,
         data: funnelKeys.map(k => funnel[k]),
-        backgroundColor: '#c45c26',
+        backgroundColor: violet,
       }]
     },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: silver, stepSize: 1 }, grid: { color: 'rgba(148,163,184,0.15)' } },
+        x: { ticks: { color: silver }, grid: { display: false } },
+      }
+    }
   });
 </script>
 {% endblock %}

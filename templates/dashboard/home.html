@@ -1,49 +1,49 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}Dashboard{% endblock %}
+{% block page_title %}{{ t.home_title }}{% endblock %}
 {% block content %}
-<h1>Dashboard</h1>
-<p class="muted">{{ current_business.name }} — bugünkü icmal</p>
+<h1>{{ t.home_title }}</h1>
+<p class="muted">{{ current_business.name }} — {{ t.home_lead }}</p>
 
 <div class="kpi-grid">
-  <div class="kpi"><div class="val">{{ kpis.messages_today }}</div><div class="lbl">Mesajlar (bugün)</div></div>
-  <div class="kpi"><div class="val">{{ kpis.ai_answered }}</div><div class="lbl">AI cavabları</div></div>
-  <div class="kpi"><div class="val">{{ kpis.human_takeover }}</div><div class="lbl">İnsan müdaxiləsi</div></div>
-  <div class="kpi"><div class="val">{{ kpis.new_leads }}</div><div class="lbl">Yeni lead</div></div>
-  <div class="kpi"><div class="val">{{ kpis.response_rate }}%</div><div class="lbl">Cavab nisbəti</div></div>
-  <div class="kpi"><div class="val">{{ kpis.knowledge_count }}</div><div class="lbl">KB elementləri</div></div>
+  <div class="kpi"><div class="val">{{ kpis.messages_today }}</div><div class="lbl">{{ t.home_kpi_messages }}</div></div>
+  <div class="kpi"><div class="val">{{ kpis.ai_answered }}</div><div class="lbl">{{ t.home_kpi_ai }}</div></div>
+  <div class="kpi"><div class="val">{{ kpis.human_takeover }}</div><div class="lbl">{{ t.home_kpi_human }}</div></div>
+  <div class="kpi"><div class="val">{{ kpis.new_leads }}</div><div class="lbl">{{ t.home_kpi_leads }}</div></div>
+  <div class="kpi"><div class="val">{{ kpis.response_rate }}%</div><div class="lbl">{{ t.home_kpi_rate }}</div></div>
+  <div class="kpi"><div class="val">{{ kpis.knowledge_count }}</div><div class="lbl">{{ t.home_kpi_kb }}</div></div>
 </div>
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
   <div class="panel">
-    <h2>Son söhbətlər</h2>
+    <h2>{{ t.home_recent_convos }}</h2>
     {% for c in conversations %}
     <div style="padding:0.55rem 0;border-top:1px solid var(--line);">
       <strong>{{ c.customer_name }}</strong>
       <span class="badge">{{ c.channel }}</span>
-      {% if c.lead_potential %}<span class="badge badge-hot">🔥 Lead</span>{% endif %}
+      {% if c.lead_potential %}<span class="badge badge-hot">🔥 {{ t.home_hot_badge }}</span>{% endif %}
       <div class="muted" style="font-size:0.85rem;">{{ c.updated_at|date:"d.m.Y H:i" }}</div>
     </div>
     {% empty %}
-    <p class="muted">Söhbət yoxdur.</p>
+    <p class="muted">{{ t.home_no_convos }}</p>
     {% endfor %}
-    <a href="{% url 'conversations:list' %}" class="btn btn-ghost" style="margin-top:0.75rem;">Hamısına bax</a>
+    <a href="{% url 'conversations:list' %}" class="btn btn-ghost" style="margin-top:0.75rem;">{{ t.home_view_all }}</a>
   </div>
   <div class="panel">
-    <h2>Sürətli əməliyyatlar</h2>
+    <h2>{{ t.home_quick }}</h2>
     <div style="display:flex;flex-direction:column;gap:0.6rem;align-items:flex-start;">
-      <a class="btn btn-primary" href="{% url 'demo:chat' %}">AI Demo aç</a>
-      <a class="btn btn-ghost" href="{% url 'knowledge:list' %}">Knowledge əlavə et</a>
-      <a class="btn btn-ghost" href="{% url 'leads:list' %}">Lead-lərə bax</a>
-      <a class="btn btn-ghost" href="{% url 'accounts:onboarding' %}">Onboarding</a>
+      <a class="btn btn-primary" href="{% url 'demo:chat' %}">{{ t.home_open_demo }}</a>
+      <a class="btn btn-ghost" href="{% url 'knowledge:list' %}">{{ t.home_add_kb }}</a>
+      <a class="btn btn-ghost" href="{% url 'leads:list' %}">{{ t.home_view_leads }}</a>
+      <a class="btn btn-ghost" href="{% url 'accounts:onboarding' %}">{{ t.home_onboarding }}</a>
     </div>
-    <h2 style="margin-top:1.5rem;">Son lead-lər</h2>
+    <h2 style="margin-top:1.5rem;">{{ t.home_recent_leads }}</h2>
     {% for l in leads %}
     <div style="padding:0.45rem 0;border-top:1px solid var(--line);">
       <strong>{{ l.name }}</strong> · {{ l.contact }}
       <div class="muted" style="font-size:0.85rem;">{{ l.status }} — {{ l.intent }}</div>
     </div>
     {% empty %}
-    <p class="muted">Lead yoxdur.</p>
+    <p class="muted">{{ t.home_no_leads }}</p>
     {% endfor %}
   </div>
 </div>
