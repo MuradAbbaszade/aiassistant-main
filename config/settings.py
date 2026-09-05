@@ -4,6 +4,7 @@ Django settings for AI Assistant SaaS.
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -83,7 +84,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {"default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")}
+# Render provides postgres://… — normalize for django-environ / Django
+_default_sqlite = f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}"
+_database_url = (env("DATABASE_URL", default="") or "").strip().strip('"').strip("'")
+if not _database_url:
+    _database_url = _default_sqlite
+if _database_url.startswith("postgres://"):
+    _database_url = "postgresql://" + _database_url[len("postgres://") :]
+
+try:
+    DATABASES = {"default": env.db_url_config(_database_url)}
+except Exception as exc:  # noqa: BLE001
+    raise ImproperlyConfigured(
+        "Invalid DATABASE_URL. On Render: Postgres → Info → copy Internal Database URL "
+        f"into the web service env var DATABASE_URL. Parse error: {exc}"
+    ) from exc
+
+if not DATABASES["default"].get("ENGINE"):
+    raise ImproperlyConfigured(
+        "DATABASE_URL was set but no database ENGINE was detected. "
+        "Use the full Internal Database URL from Render Postgres "
+        "(starts with postgres:// or postgresql://)."
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
