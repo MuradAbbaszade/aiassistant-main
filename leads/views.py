@@ -29,5 +29,5 @@ def lead_update_status(request, pk: int):
     if status in {c.value for c in LeadStatus}:
         lead.status = status
         lead.save(update_fields=["status", "updated_at"])
-        messages.success(request, "Lead statusu yeniləndi.")
+        messages.success(request, "Status yeniləndi.")
     return redirect("leads:list")

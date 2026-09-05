@@ -1,18 +1,24 @@
 {% extends "dashboard/base_dashboard.html" %}
-{% block page_title %}Kanallar{% endblock %}
+{% block page_title %}Bağlantı{% endblock %}
 {% block content %}
-<h1>Kanallar</h1>
-<p class="muted">Instagram real OAuth ilə qoşulur. WhatsApp / Vebsayt — tezliklə.</p>
+<h1>Instagram bağlantısı</h1>
+<p class="muted">Hesabınızı idarə edin və gələn müştəri mesajlarına baxın.</p>
 
 <div class="panel" style="margin-bottom:1.25rem;">
-  <h2 style="margin-top:0;">Instagram hesabınız</h2>
+  <h2 style="margin-top:0;">Sizin hesabınız</h2>
   {% if ig_channel and ig_channel.is_live %}
-  <p><span class="badge badge-ok">Canlı</span> {{ ig_channel.handle }} · ID <code>{{ ig_channel.external_id }}</code></p>
-  <p class="muted">Token saxlanılıb — müştəri DM-lərinə AI cavab verə bilər.</p>
+  <p>
+    <span class="badge badge-ok">Qoşulub</span>
+    <strong>{{ ig_channel.handle }}</strong>
+  </p>
+  <p class="muted">AI Instagram mesajlarınıza avtomatik cavab verə bilər.</p>
+  {% if ig_channel.last_error %}
+  <p class="form-error" style="margin-top:0.75rem;">Bağlantıda problem var. Yenidən qoşulun və ya dəstəyə yazın.</p>
+  {% endif %}
   <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;">
-    <a class="btn btn-ghost" href="{% url 'accounts:instagram_login' %}">Yenidən icazə ver (OAuth)</a>
+    <a class="btn btn-ghost" href="{% url 'accounts:instagram_login' %}">Yenidən qoşul</a>
     <form method="post" action="{% url 'channels:instagram_resubscribe' %}">{% csrf_token %}
-      <button class="btn btn-ghost" type="submit">Webhook-u yenidən subscribe et</button>
+      <button class="btn btn-ghost" type="submit">Mesaj qəbulunu yenilə</button>
     </form>
     <form method="post" action="{% url 'channels:instagram_disconnect' %}">{% csrf_token %}
       <button class="btn btn-ghost" type="submit">Bağlantını kəs</button>
@@ -20,37 +26,29 @@
   </div>
   {% else %}
   <p><span class="badge badge-warn">Qoşulmayıb</span></p>
-  <a class="btn btn-primary" href="{% url 'accounts:instagram_login' %}">Instagram ilə qoşul</a>
+  <p class="muted">Instagram biznes hesabınızı qoşun ki, AI mesajlara cavab versin.</p>
+  <a class="btn btn-primary" style="margin-top:0.75rem;" href="{% url 'accounts:instagram_login' %}">Instagram ilə qoşul</a>
   {% endif %}
-
-  <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--line);">
-    <p class="muted" style="margin-bottom:0.35rem;">OAuth Redirect URI:</p>
-    <pre style="background:#102420;color:#e8f2ef;padding:0.65rem 0.8rem;border-radius:10px;font-size:0.8rem;overflow:auto;">{{ redirect_uri }}</pre>
-    <p class="muted" style="margin:0.75rem 0 0.35rem;">Webhook URL:</p>
-    <pre style="background:#102420;color:#e8f2ef;padding:0.65rem 0.8rem;border-radius:10px;font-size:0.8rem;overflow:auto;">{{ webhook_url }}</pre>
-    <p class="muted">Verify token: <code>{{ verify_token }}</code></p>
-  </div>
 </div>
 
 <div class="panel" style="margin-bottom:1.25rem;">
-  <h2 style="margin-top:0;">Gələn mesajlar — real Instagram</h2>
+  <h2 style="margin-top:0;">Son mesajlar</h2>
   {% if real_messages %}
-  <p class="muted">Meta webhook ilə gələn real DM-lər (rəqəmsal IGSID).</p>
+  <p class="muted">Instagram-dan gələn son söhbətlər.</p>
   <div style="max-height:420px;overflow:auto;">
     <table class="table">
       <thead>
         <tr>
           <th>Vaxt</th>
+          <th>Müştəri</th>
           <th>Kim</th>
-          <th>Göndərən</th>
           <th>Mesaj</th>
-          <th>IGSID</th>
         </tr>
       </thead>
       <tbody>
         {% for m in real_messages %}
         <tr>
-          <td class="muted" style="white-space:nowrap;font-size:0.85rem;">{{ m.timestamp|date:"d.m H:i:s" }}</td>
+          <td class="muted" style="white-space:nowrap;font-size:0.85rem;">{{ m.timestamp|date:"d.m H:i" }}</td>
           <td><strong>{{ m.conversation.customer_name }}</strong></td>
           <td>
             {% if m.sender == 'customer' %}<span class="badge">Müştəri</span>
@@ -58,126 +56,42 @@
             {% else %}<span class="badge">{{ m.sender }}</span>{% endif %}
           </td>
           <td style="white-space:pre-wrap;">{{ m.content }}</td>
-          <td class="muted" style="font-size:0.78rem;"><code>{{ m.conversation.external_user_id }}</code></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  {% else %}
-  <div class="form-error">
-    <strong>Real Instagram mesajı hələ gəlməyib.</strong><br>
-    Siz IG-dən yazmısınız, amma Meta app-ə <code>POST /webhooks/instagram/</code> göndərmir.
-    Ona görə AI Instagram-da cavab vermir.<br><br>
-    Webhook POST sayı (log): <strong>{{ webhook_post_count }}</strong>
-    {% if webhook_post_count == 0 %}(0 = heç bir real DM event gəlməyib){% endif %}
-  </div>
-  <ol class="muted" style="margin:0.75rem 0 0;padding-left:1.2rem;font-size:0.9rem;">
-    <li>Meta → Instagram use case → Webhooks: URL + <code>messages</code> field</li>
-    <li>App-i <strong>Live / Publish</strong> edin (Meta yazır: published state lazımdır)</li>
-    <li>Başqa IG hesabından @ hesabınıza yazın (özünüzə yazmaq olmaz)</li>
-    <li>Bu səhifəni yeniləyin — real IGSID olan sətir görünməlidir</li>
-  </ol>
-  {% endif %}
-
-  {% if real_threads %}
-  <h3 style="font-size:1rem;margin-top:1.25rem;">Real thread-lər</h3>
-  {% for t in real_threads %}
-  <div style="border-top:1px solid var(--line);padding-top:0.75rem;margin-top:0.5rem;">
-    <strong>{{ t.customer_name }}</strong>
-    <span class="muted" style="font-size:0.82rem;"> · {{ t.updated_at|date:"d.m H:i" }} · <code>{{ t.external_user_id }}</code></span>
-    {% for m in t.messages.all %}
-    <div class="msg-row" style="margin-top:0.35rem;padding:0.45rem 0.6rem;">
-      <span class="muted" style="font-size:0.75rem;">{{ m.get_sender_display }} · {{ m.timestamp|date:"H:i:s" }}</span>
-      <div>{{ m.content }}</div>
-    </div>
-    {% endfor %}
-  </div>
-  {% endfor %}
-  {% endif %}
-
-  <details style="margin-top:1rem;">
-    <summary class="muted" style="cursor:pointer;">Demo / simulyasiya mesajları ({{ demo_messages|length }})</summary>
-    {% if demo_messages %}
-    <table class="table" style="margin-top:0.5rem;">
-      <thead><tr><th>Vaxt</th><th>Kim</th><th>Göndərən</th><th>Mesaj</th></tr></thead>
-      <tbody>
-        {% for m in demo_messages %}
-        <tr>
-          <td class="muted" style="font-size:0.85rem;">{{ m.timestamp|date:"d.m H:i" }}</td>
-          <td>{{ m.conversation.customer_name }} <span class="badge badge-warn">demo</span></td>
-          <td>{{ m.sender }}</td>
-          <td>{{ m.content }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p class="muted">Demo mesaj yoxdur.</p>
-    {% endif %}
-  </details>
-
   <p style="margin-top:0.75rem;">
+    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">Bütün söhbətlər</a>
     <a class="btn btn-ghost" href="{% url 'channels:list' %}">Yenilə</a>
   </p>
-</div>
-
-{% if ig_channel and ig_channel.is_live %}
-<div class="panel" style="margin-bottom:1.25rem;">
-  <h2>Test DM göndər</h2>
-  <p class="muted">Müştəri əvvəlcə sizə yazmalıdır. IGSID webhook logundan gəlir.</p>
-  <form method="post" action="{% url 'channels:instagram_test_send' %}">
-    {% csrf_token %}
-    <label>Müştəri IGSID</label>
-    <input name="igsid" placeholder="sender.id from webhook">
-    <label style="margin-top:0.5rem;display:block;">Mesaj</label>
-    <input name="text" value="Hello! AI Assistant test message.">
-    <button class="btn btn-amber" style="margin-top:0.75rem;" type="submit">Göndər</button>
-  </form>
-  {% if ig_channel.last_error %}<p class="form-error" style="margin-top:0.75rem;">{{ ig_channel.last_error }}</p>{% endif %}
-</div>
-
-<div class="panel" style="margin-bottom:1.25rem;">
-  <h2>Inspect / simulyasiya</h2>
-  <p class="muted">
-    Instagram-dan cavab gəlmirsə: aşağıda <strong>POST</strong> yoxdursa Meta webhook göndərmir
-    (App Live/publish, messages field, tunnel URL).
-  </p>
-  <form method="post" action="{% url 'channels:instagram_simulate' %}" style="margin-bottom:1rem;">
-    {% csrf_token %}
-    <label>Simulyasiya mesajı (AI + DB test)</label>
-    <input name="text" value="Salam, instagram avtomasiya qiymeti neceyedir?">
-    <button class="btn btn-primary" style="margin-top:0.5rem;" type="submit">Webhook simulyasiya et</button>
-  </form>
-  <h3 style="font-size:1rem;">Son webhook event-ləri</h3>
-  {% if recent_hooks %}
-  <div style="max-height:320px;overflow:auto;font-size:0.8rem;">
-    {% for h in recent_hooks %}
-    <pre style="background:#102420;color:#e8f2ef;padding:0.65rem;border-radius:10px;white-space:pre-wrap;">{{ h.method }} {{ h.ts }}
-object={{ h.object }}
-{% if h.result %}result={{ h.result }}{% endif %}
-{% if h.error %}error={{ h.error }}{% endif %}</pre>
-    {% endfor %}
-  </div>
   {% else %}
-  <p class="muted">Hələ log yoxdur. Real DM gələndə burada <code>POST</code> görünməlidir.</p>
+  <p class="muted" style="margin-bottom:0.75rem;">
+    Hələ mesaj yoxdur. Başqa bir Instagram hesabından <strong>{{ ig_channel.handle|default:"biznes profilinizə" }}</strong> yazın — cavab burada görünəcək.
+  </p>
+  <ol class="muted" style="margin:0;padding-left:1.2rem;font-size:0.9rem;">
+    <li>Başqa hesaba keçin (öz hesabınıza özünüzdən yazmaq olmur)</li>
+    <li>Biznes profilinizə sadə bir sual göndərin</li>
+    <li>Bu səhifəni yeniləyin və ya Söhbətlər bölməsinə baxın</li>
+  </ol>
+  <p style="margin-top:0.75rem;">
+    <a class="btn btn-ghost" href="{% url 'channels:list' %}">Yenilə</a>
+    <a class="btn btn-ghost" href="{% url 'conversations:list' %}">Söhbətlər</a>
+  </p>
   {% endif %}
-  <p class="muted" style="font-size:0.8rem;">Log: <code>logs/instagram_webhooks.jsonl</code></p>
 </div>
-{% endif %}
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
-  {% for ch in channels %}
+  {% for ch in other_channels %}
   <div class="panel">
-    <h2>{{ ch.get_type_display }}</h2>
-    {% if ch.status == 'live' %}<span class="badge badge-ok">Canlı</span>
-    {% elif ch.status == 'connected' %}<span class="badge badge-ok">Qoşulub</span>
-    {% elif ch.status == 'coming_soon' %}<span class="badge badge-warn">Tezliklə</span>
-    {% else %}<span class="badge">Qoşulmayıb</span>{% endif %}
-    <p class="muted" style="margin-top:0.5rem;">{{ ch.handle|default:"—" }}</p>
+    <h2 style="margin-top:0;">{{ ch.get_type_display }}</h2>
+    {% if ch.status == 'coming_soon' %}
+    <span class="badge badge-warn">Tezliklə</span>
+    <p class="muted" style="margin-top:0.5rem;">Bu kanal tezliklə əlavə olunacaq.</p>
+    {% else %}
+    <span class="badge">Qoşulmayıb</span>
+    {% endif %}
   </div>
-  {% empty %}
-  <p class="muted">Kanal yoxdur — Instagram ilə daxil olun.</p>
   {% endfor %}
 </div>
 {% endblock %}

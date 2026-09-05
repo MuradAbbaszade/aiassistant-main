@@ -7,8 +7,8 @@ from conversations.models import Conversation
 class LeadStatus(models.TextChoices):
     NEW = "New", "Yeni"
     CONTACTED = "Contacted", "Əlaqə saxlanılıb"
-    QUALIFIED = "Qualified", "Uyğun"
-    CONVERTED = "Converted", "Çevrilib"
+    QUALIFIED = "Qualified", "Uyğundur"
+    CONVERTED = "Converted", "Müştəri oldu"
     LOST = "Lost", "İtirilib"
 
 
