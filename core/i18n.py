@@ -155,7 +155,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "en": "Let AI answer customer questions automatically",
         "ru": "Пусть ИИ автоматически отвечает клиентам",
     },
-    "how.cta": {"az": "Instagram ilə başla", "en": "Start with Instagram", "ru": "Начать с Instagram"},
+    "how.cta": {"az": "Hesab yaradın", "en": "Create account", "ru": "Создать аккаунт"},
     "footer.blurb": {
         "az": "Vaxta və pula qənaət · daha çox müştəri · Instagram AI.",
         "en": "Save time & money · win more customers · Instagram AI.",

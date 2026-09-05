@@ -1,6 +1,4 @@
-import json
-
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from analytics.services import compute_business_analytics
 from conversations.queries import customer_conversations
@@ -13,7 +11,7 @@ from leads.models import Lead
 def dashboard(request):
     business = request.current_business
     if not business:
-        return render(request, "dashboard/empty.html")
+        return redirect("accounts:onboarding")
 
     stats = compute_business_analytics(business, getattr(request, "ui_lang", None))
     conversations = customer_conversations(business)[:6]
@@ -44,7 +42,7 @@ def dashboard(request):
 def analytics_page(request):
     business = request.current_business
     if not business:
-        return render(request, "dashboard/empty.html")
+        return redirect("accounts:onboarding")
 
     stats = compute_business_analytics(business, getattr(request, "ui_lang", None))
     return render(
