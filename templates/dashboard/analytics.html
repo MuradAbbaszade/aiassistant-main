@@ -1,0 +1,85 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block page_title %}Analitika{% endblock %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Analitika</h1>
+<p class="muted">{{ current_business.name }} metrikaları</p>
+
+{% if snap %}
+<div class="kpi-grid">
+  <div class="kpi"><div class="val">{{ snap.messages_today }}</div><div class="lbl">Mesajlar</div></div>
+  <div class="kpi"><div class="val">{{ snap.ai_answered }}</div><div class="lbl">AI cavab</div></div>
+  <div class="kpi"><div class="val">{{ snap.human_takeover }}</div><div class="lbl">İnsan</div></div>
+  <div class="kpi"><div class="val">{{ snap.new_leads }}</div><div class="lbl">Yeni lead</div></div>
+  <div class="kpi"><div class="val">{{ response_rate_pct }}%</div><div class="lbl">Cavab nisbəti</div></div>
+</div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
+  <div class="panel">
+    <h2>Mesajlar / gün</h2>
+    <canvas id="messagesChart" height="180"></canvas>
+  </div>
+  <div class="panel">
+    <h2>AI vs İnsan</h2>
+    <canvas id="aiHumanChart" height="180"></canvas>
+  </div>
+  <div class="panel">
+    <h2>Lead funnel</h2>
+    <canvas id="funnelChart" height="180"></canvas>
+  </div>
+</div>
+{% endblock %}
+{% block page_scripts %}
+<script>
+  const series = {{ series_json|safe }};
+  const aiVs = {{ ai_vs_json|safe }};
+  const funnel = {{ funnel_json|safe }};
+
+  const msgLabels = (series || []).map(x => x.date);
+  const msgData = (series || []).map(x => x.count);
+
+  new Chart(document.getElementById('messagesChart'), {
+    type: 'line',
+    data: {
+      labels: msgLabels,
+      datasets: [{
+        label: 'Mesajlar',
+        data: msgData,
+        borderColor: '#0d6e6e',
+        backgroundColor: 'rgba(13,110,110,0.15)',
+        tension: 0.35,
+        fill: true,
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  new Chart(document.getElementById('aiHumanChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['AI', 'İnsan'],
+      datasets: [{
+        data: [aiVs.ai || 0, aiVs.human || 0],
+        backgroundColor: ['#0d6e6e', '#c45c26'],
+      }]
+    }
+  });
+
+  const funnelKeys = Object.keys(funnel || {});
+  new Chart(document.getElementById('funnelChart'), {
+    type: 'bar',
+    data: {
+      labels: funnelKeys,
+      datasets: [{
+        label: 'Lead-lər',
+        data: funnelKeys.map(k => funnel[k]),
+        backgroundColor: '#c45c26',
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+</script>
+{% endblock %}

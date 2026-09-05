@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Onboarding — AI Assistant{% endblock %}
+{% block body_class %}landing-body{% endblock %}
+{% block body %}
+<header class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="brand">AI Assistant</a>
+    <a class="btn btn-primary" href="{% url 'analytics:dashboard' %}">Dashboard</a>
+  </div>
+</header>
+<section class="section">
+  <h1>Onboarding yoxlama siyahısı</h1>
+  <p class="section-lead">Demo üçün 5 addımlıq hazırlıq. Bəzi addımlar seed data ilə artıq tamamlanıb.</p>
+  <ol class="steps">
+    {% for s in steps %}
+    <li>
+      <div>
+        <strong>{{ s.title }}</strong>
+        <div class="muted">{{ s.desc }}</div>
+        {% if s.done %}<span class="badge badge-ok">Tamam</span>{% else %}<span class="badge badge-warn">Gözləyir</span>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+        <div style="display:flex;gap:0.6rem;margin-top:1.5rem;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="{% url 'knowledge:list' %}">Knowledge Base aç</a>
+          <a class="btn btn-ghost" href="{% url 'channels:list' %}">Kanallar / Webhook</a>
+          <a class="btn btn-ghost" href="{% url 'analytics:dashboard' %}">Dashboard</a>
+        </div>
+</section>
+{% endblock %}

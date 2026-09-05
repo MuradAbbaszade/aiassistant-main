@@ -1,0 +1,66 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block page_title %}Knowledge Base{% endblock %}
+{% block content %}
+<h1>Knowledge Base</h1>
+<p class="muted">Dəyişikliklər dərhal AI cavablarına təsir edir (eyni DB).</p>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <h2>Yeni element</h2>
+  <form method="post" action="{% url 'knowledge:create' %}">
+    {% csrf_token %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;">
+      <div>
+        <label>Tip</label>
+        <select name="type">
+          {% for val, label in types.choices %}
+          <option value="{{ val }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Başlıq</label>
+        <input name="title" required placeholder="Məs: Ev tikintisi">
+      </div>
+      <div>
+        <label>Keywords (vergüllə)</label>
+        <input name="keywords" placeholder="qiymət, m2, bakı">
+      </div>
+    </div>
+    <label style="display:block;margin-top:0.75rem;">Məzmun</label>
+    <textarea name="content" rows="3" required></textarea>
+    <button class="btn btn-primary" style="margin-top:0.75rem;" type="submit">Əlavə et</button>
+  </form>
+</div>
+
+{% for type_key, items in by_type.items %}
+{% if items %}
+<div class="panel kb-section">
+  <h2>{{ type_key }}</h2>
+  {% for item in items %}
+  <details class="kb-item">
+    <summary>{{ item.title }} <span class="muted" style="font-weight:500;">· {{ item.updated_at|date:"d.m.Y H:i" }}</span></summary>
+    <p>{{ item.content }}</p>
+    <p class="muted" style="font-size:0.85rem;">Keywords: {{ item.keywords|join:", " }}</p>
+    <form method="post" action="{% url 'knowledge:update' item.id %}" style="margin-top:0.75rem;">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="{{ item.type }}">
+      <label>Başlıq</label>
+      <input name="title" value="{{ item.title }}">
+      <label>Məzmun</label>
+      <textarea name="content" rows="3">{{ item.content }}</textarea>
+      <label>Keywords</label>
+      <input name="keywords" value="{{ item.keywords|join:', ' }}">
+      <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
+        <button class="btn btn-primary" type="submit">Saxla</button>
+      </div>
+    </form>
+    <form method="post" action="{% url 'knowledge:delete' item.id %}" style="margin-top:0.4rem;" onsubmit="return confirm('Silinsin?');">
+      {% csrf_token %}
+      <button class="btn btn-ghost" type="submit">Sil</button>
+    </form>
+  </details>
+  {% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}

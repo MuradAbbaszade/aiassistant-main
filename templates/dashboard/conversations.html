@@ -1,0 +1,38 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block page_title %}Söhbətlər{% endblock %}
+{% block content %}
+<h1>Söhbətlər</h1>
+<p class="muted">Oxumaq üçün master-detail inbox (demo).</p>
+<div class="inbox panel" style="padding:0;overflow:hidden;">
+  <div class="inbox-list" style="border-right:1px solid var(--line);max-height:560px;overflow:auto;">
+    {% for c in conversations %}
+    <a href="?c={{ c.id }}" style="display:block;">
+      <button type="button" class="{% if selected and selected.id == c.id %}active{% endif %}">
+        <strong>{{ c.customer_name }}</strong>
+        <div class="muted" style="font-size:0.82rem;">{{ c.channel }} · {{ c.status }}</div>
+        {% if c.lead_potential %}<span class="badge badge-hot">🔥</span>{% endif %}
+      </button>
+    </a>
+    {% empty %}
+    <p class="muted" style="padding:1rem;">Söhbət yoxdur.</p>
+    {% endfor %}
+  </div>
+  <div style="padding:1rem;">
+    {% if selected %}
+    <h2 style="margin-top:0;">{{ selected.customer_name }}</h2>
+    <div class="muted" style="margin-bottom:1rem;">{{ selected.get_channel_display }} · {{ selected.get_status_display }}</div>
+    <div class="msg-thread">
+      {% for m in selected.messages.all %}
+      <div class="msg-row">
+        <div style="font-weight:700;font-size:0.85rem;">{{ m.get_sender_display }} {% if m.label %}<span class="badge">{{ m.label }}</span>{% endif %}</div>
+        <div>{{ m.content }}</div>
+        <div class="muted" style="font-size:0.78rem;">{{ m.timestamp|date:"d.m.Y H:i" }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">Söhbət seçin.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

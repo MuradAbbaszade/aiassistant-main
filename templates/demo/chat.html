@@ -1,0 +1,59 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block page_title %}AI Demo{% endblock %}
+{% block content %}
+<h1>AI Demo</h1>
+<p class="muted">Instagram-üslublu çat · {{ business.name }} · Knowledge Base + mock RAG</p>
+
+<div class="demo-layout">
+  <div class="chat-frame">
+    <div class="chat-header">
+      <div class="avatar">AI</div>
+      <div>
+        <strong id="chatBizName">{{ business.name }}</strong>
+        <div class="muted" style="color:rgba(255,255,255,0.55);font-size:0.8rem;">Instagram · onlayn</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:0.4rem;">
+        {% if scenario %}
+        <button type="button" class="btn btn-amber" id="runScenarioBtn" style="padding:0.55rem 0.9rem;font-size:0.85rem;">Demo Ssenari</button>
+        {% endif %}
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-composer">
+      <input type="text" id="chatInput" placeholder="Mesaj yazın..." autocomplete="off">
+      <button type="button" class="btn btn-primary" id="sendBtn">Göndər</button>
+    </div>
+  </div>
+
+  <aside class="side-meta">
+    <div class="meta-card">
+      <h3 style="margin:0 0 0.5rem;font-size:1rem;">Knowledge axtarış</h3>
+      <input id="kbSearch" placeholder="KB-də axtar..." style="margin-bottom:0.5rem;">
+      <div id="kbResults" class="muted" style="font-size:0.88rem;max-height:160px;overflow:auto;"></div>
+    </div>
+    <div class="meta-card">
+      <h3 style="margin:0 0 0.5rem;font-size:1rem;">AI cavab metadatası</h3>
+      <div id="leadBadge" style="display:none;margin-bottom:0.5rem;"><span class="badge badge-hot">🔥 Potensial müştəri</span></div>
+      <div><strong>Intent:</strong> <span id="metaIntent">—</span></div>
+      <div style="margin:0.45rem 0;"><strong>Confidence:</strong> <span id="metaConf">—</span></div>
+      <div class="confidence-bar"><span id="confBar" style="width:0%"></span></div>
+      <div style="margin-top:0.55rem;"><strong>Human lazımdır:</strong> <span id="metaHuman">—</span></div>
+      <div id="relevantItems" style="margin-top:0.75rem;font-size:0.85rem;"></div>
+    </div>
+    <div class="meta-card">
+      <h3 style="margin:0 0 0.5rem;font-size:1rem;">Canlı Instagram</h3>
+      <p class="muted" style="font-size:0.88rem;margin:0;">
+        Bu panel Knowledge Base cavablarını sınaqdan keçirir.
+        Real müştəri DM-ləri Instagram hesabınıza gəlir — Kanallar səhifəsinə baxın.
+      </p>
+    </div>
+  </aside>
+</div>
+{% endblock %}
+{% block page_scripts %}
+<script>
+  const SCENARIO = {{ scenario_json|safe }};
+  const CURRENT_BUSINESS_ID = "{{ business.id }}";
+</script>
+<script src="/static/js/demo.js"></script>
+{% endblock %}

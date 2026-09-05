@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ t.meta_title_landing }}{% endblock %}
+{% block body_class %}landing-body{% endblock %}
+{% block body %}
+<header class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="brand">AI Assistant</a>
+    <nav class="nav-links">
+      <a href="#benefits">{{ t.nav_benefits }}</a>
+      <a href="#features">{{ t.nav_features }}</a>
+      <a href="#industries">{{ t.nav_industries }}</a>
+      <a href="#how">{{ t.nav_how }}</a>
+      <a href="{% url 'accounts:login' %}">{{ t.nav_signin }}</a>
+    </nav>
+    <div class="nav-actions">
+      {% include "partials/lang_switcher.html" %}
+      <a class="btn btn-primary" href="{% url 'accounts:instagram_login' %}">{{ t.nav_connect }}</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-plane" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-a" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-b" aria-hidden="true"></div>
+  <div class="hero-shell">
+    <div class="hero-content">
+      <p class="hero-kicker">{{ t.hero_kicker }}</p>
+      <h1 class="hero-brand">AI Assistant</h1>
+      <p class="hero-headline">{{ t.hero_headline }}</p>
+      <p class="hero-tag">{{ t.hero_tag }}</p>
+      <div class="hero-cta">
+        <a class="btn btn-amber" href="{% url 'accounts:instagram_login' %}">{{ t.hero_cta_primary }}</a>
+        <a class="btn btn-ghost" href="#how">{{ t.hero_cta_secondary }}</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-visual-glow"></div>
+      <div class="dm-stage">
+        <div class="dm-line dm-line-in">{{ t.hero_dm_in }}</div>
+        <div class="dm-line dm-line-out">
+          {{ t.hero_dm_out }}
+          <small>{{ t.hero_dm_label }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tight" id="benefits">
+  <div class="section-head">
+    <h2>{{ t.benefits_title }}</h2>
+    <p class="section-lead">{{ t.benefits_lead }}</p>
+  </div>
+  <div class="benefit-grid">
+    {% for b in benefits %}
+    <article class="benefit-item">
+      <h3>{{ b.title }}</h3>
+      <p>{{ b.desc }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-head">
+    <h2>{{ t.features_title }}</h2>
+    <p class="section-lead">{{ t.features_lead }}</p>
+  </div>
+  <div class="feature-grid">
+    {% for f in features %}
+    <article class="feature-item">
+      <span class="feature-index">0{{ forloop.counter }}</span>
+      <h3>{{ f.title }}</h3>
+      <p>{{ f.desc }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section band" id="industries">
+  <div class="section-head">
+    <h2>{{ t.industries_title }}</h2>
+    <p class="section-lead">{{ t.industries_lead }}</p>
+  </div>
+  <div class="industry-row">
+    {% for i in industries %}
+    <span>{{ i }}</span>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="section-head">
+    <h2>{{ t.how_title }}</h2>
+    <p class="section-lead">{{ t.how_lead }}</p>
+  </div>
+  <ol class="steps">
+    {% for s in how_steps %}
+    <li>{{ s }}</li>
+    {% endfor %}
+  </ol>
+  <div class="section-cta">
+    <a class="btn btn-primary" href="{% url 'accounts:instagram_login' %}">{{ t.how_cta }}</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div>
+      <strong class="brand">AI Assistant</strong>
+      <div class="muted">{{ t.footer_blurb }}</div>
+    </div>
+    <div class="footer-meta">
+      {% include "partials/lang_switcher.html" %}
+      <a href="{% url 'accounts:login' %}">{{ t.nav_signin }}</a>
+    </div>
+  </div>
+</footer>
+{% endblock %}

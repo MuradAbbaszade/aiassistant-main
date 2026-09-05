@@ -1,0 +1,16 @@
+<form class="lang-switch" action="{% url 'set_language' %}" method="post">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <span class="lang-switch-label">{{ t.lang_label }}</span>
+  <div class="lang-switch-opts" role="group" aria-label="{{ t.lang_label }}">
+    {% for opt in lang_choices %}
+    <button
+      type="submit"
+      name="language"
+      value="{{ opt.code }}"
+      class="lang-opt{% if opt.code == ui_lang %} is-active{% endif %}"
+      {% if opt.code == ui_lang %}aria-current="true"{% endif %}
+    >{{ opt.label }}</button>
+    {% endfor %}
+  </div>
+</form>
