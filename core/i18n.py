@@ -494,6 +494,11 @@ STRINGS: dict[str, dict[str, str]] = {
     "auth.otp_code": {"az": "OTP kod", "en": "OTP code", "ru": "Код OTP"},
     "auth.otp_cta": {"az": "Təsdiqlə", "en": "Verify", "ru": "Подтвердить"},
     "auth.otp_resend": {"az": "Kodu yenidən göndər", "en": "Resend code", "ru": "Отправить код снова"},
+    "auth.otp_wait": {
+        "az": "Yenidən göndərmək üçün gözləyin:",
+        "en": "Wait before resending:",
+        "ru": "Подождите перед повторной отправкой:",
+    },
     "onb.hello": {"az": "Salam,", "en": "Hi,", "ru": "Здравствуйте,"},
     "onb.choose_lead": {
         "az": "AI-nizi necə quraşdırmaq istəyirsiniz?",
