@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 OTP_TTL_MINUTES = 10
 EMAIL_SEND_TIMEOUT = 8
+OTP_RESEND_COOLDOWN_SECONDS = 120
 
 
 def generate_otp_code() -> str:

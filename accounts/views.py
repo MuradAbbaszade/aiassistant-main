@@ -2,11 +2,17 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from accounts.forms import LoginForm, OTPForm, RegisterForm
 from accounts.models import UserProfile, default_whatsapp_url
-from accounts.services.otp import create_email_otp, send_otp_email, verify_otp
+from accounts.services.otp import (
+    OTP_RESEND_COOLDOWN_SECONDS,
+    create_email_otp,
+    send_otp_email,
+    verify_otp,
+)
 from channels.models import Channel, ChannelStatus, ChannelType
 from channels.services.oauth import (
     build_authorize_url,
@@ -26,6 +32,7 @@ def _establish_session(request, user, business=None):
     if biz:
         request.session["current_business_id"] = biz.id
     request.session.pop("demo_conversation_id", None)
+    request.session.pop("otp_sent_at", None)
 
 
 def _post_login_redirect(user):
@@ -41,10 +48,32 @@ def _post_login_redirect(user):
     return redirect("accounts:onboarding")
 
 
-def _start_otp(request, user):
+def _otp_resend_wait_seconds(request) -> int:
+    sent_at = request.session.get("otp_sent_at")
+    if not sent_at:
+        return 0
+    try:
+        sent_ts = float(sent_at)
+    except (TypeError, ValueError):
+        return 0
+    elapsed = timezone.now().timestamp() - sent_ts
+    remaining = int(OTP_RESEND_COOLDOWN_SECONDS - elapsed)
+    return max(0, remaining)
+
+
+def _start_otp(request, user, *, force: bool = False):
     """Create OTP and attempt email send without blocking the HTTP request forever."""
+    wait = _otp_resend_wait_seconds(request)
+    if not force and wait > 0:
+        messages.info(
+            request,
+            f"Yeni kod göndərmək üçün {wait} saniyə gözləyin.",
+        )
+        return redirect("accounts:verify_email")
+
     otp = create_email_otp(user)
     request.session["pending_otp_user_id"] = user.id
+    request.session["otp_sent_at"] = timezone.now().timestamp()
     from django.conf import settings
 
     try:
@@ -59,7 +88,7 @@ def _start_otp(request, user):
     else:
         messages.error(
             request,
-            "Email göndərilmədi (SMTP cavab vermir). Bir az sonra «Kodu yenidən göndər» edin.",
+            "Email göndərilmədi. Bir az sonra «Kodu yenidən göndər» edin.",
         )
     if settings.DEBUG:
         messages.info(request, f"DEBUG OTP: {otp.code}")

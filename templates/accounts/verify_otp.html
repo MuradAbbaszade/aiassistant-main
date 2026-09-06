@@ -17,10 +17,38 @@
       {% if form.code.errors %}<div class="field-error">{{ form.code.errors.0 }}</div>{% endif %}
       <button class="btn btn-primary" style="width:100%;margin-top:1.1rem;" type="submit">{{ t.auth_otp_cta }}</button>
     </form>
-    <form method="post" action="{% url 'accounts:resend_otp' %}" style="margin-top:0.85rem;text-align:center;">
+
+    <form method="post" action="{% url 'accounts:resend_otp' %}" style="margin-top:0.85rem;text-align:center;" id="resendOtpForm">
       {% csrf_token %}
-      <button class="btn btn-ghost" type="submit">{{ t.auth_otp_resend }}</button>
+      <button class="btn btn-ghost" type="submit" id="resendOtpBtn"
+        {% if resend_wait_seconds > 0 %}disabled{% endif %}>
+        {{ t.auth_otp_resend }}
+      </button>
+      <p class="muted" id="resendOtpWait" style="margin:0.5rem 0 0;font-size:0.88rem;{% if resend_wait_seconds <= 0 %}display:none;{% endif %}">
+        {{ t.auth_otp_wait }} <span id="resendOtpSecs">{{ resend_wait_seconds }}</span>s
+      </p>
     </form>
   </div>
 </div>
+<script>
+(function () {
+  const waitEl = document.getElementById('resendOtpWait');
+  const secsEl = document.getElementById('resendOtpSecs');
+  const btn = document.getElementById('resendOtpBtn');
+  let left = parseInt(secsEl?.textContent || '0', 10) || 0;
+  if (!btn || left <= 0) return;
+  btn.disabled = true;
+  const tick = () => {
+    left -= 1;
+    if (left <= 0) {
+      btn.disabled = false;
+      if (waitEl) waitEl.style.display = 'none';
+      return;
+    }
+    if (secsEl) secsEl.textContent = String(left);
+    setTimeout(tick, 1000);
+  };
+  setTimeout(tick, 1000);
+})();
+</script>
 {% endblock %}
