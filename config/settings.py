@@ -233,4 +233,9 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=8)  # seconds — prevents login hang on bad SMTP
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="AI Assistant <noreply@aiassistant.local>")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="AI Assistant <onboarding@resend.dev>")
+
+# HTTPS email APIs (recommended on Render — SMTP is often blocked with Errno 101)
+RESEND_API_KEY = env("RESEND_API_KEY", default="")
+BREVO_API_KEY = env("BREVO_API_KEY", default="")
+BREVO_SENDER_EMAIL = env("BREVO_SENDER_EMAIL", default="")

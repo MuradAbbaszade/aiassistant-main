@@ -5,6 +5,7 @@ import secrets
 import socket
 from datetime import timedelta
 
+import requests
 from django.conf import settings
 from django.core.mail import get_connection, send_mail
 from django.utils import timezone
@@ -30,12 +31,7 @@ def create_email_otp(user) -> EmailOTP:
     )
 
 
-def send_otp_email(user, otp: EmailOTP) -> tuple[bool, str]:
-    """Send OTP email quickly. Never block the request for long SMTP waits.
-
-    Returns (ok, detail). detail may include the OTP code when email cannot be sent
-    and DEBUG is on (or EMAIL_HOST is empty).
-    """
+def _otp_body(user, otp: EmailOTP) -> tuple[str, str]:
     subject = "AI Assistant — email verification code"
     body = (
         f"Salam {user.first_name or ''},\n\n"
@@ -43,18 +39,76 @@ def send_otp_email(user, otp: EmailOTP) -> tuple[bool, str]:
         f"It expires in {OTP_TTL_MINUTES} minutes.\n\n"
         f"— AI Assistant"
     )
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None) or "noreply@aiassistant.local"
+    return subject, body
+
+
+def _from_email() -> str:
+    return getattr(settings, "DEFAULT_FROM_EMAIL", None) or "AI Assistant <onboarding@resend.dev>"
+
+
+def _send_via_resend(to_email: str, subject: str, body: str) -> bool:
+    """HTTPS API — works on Render (SMTP ports are often blocked)."""
+    api_key = (getattr(settings, "RESEND_API_KEY", "") or "").strip()
+    if not api_key:
+        return False
+    resp = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "from": _from_email(),
+            "to": [to_email],
+            "subject": subject,
+            "text": body,
+        },
+        timeout=EMAIL_SEND_TIMEOUT,
+    )
+    if resp.status_code >= 400:
+        logger.error("Resend API error %s: %s", resp.status_code, resp.text[:500])
+        resp.raise_for_status()
+    return True
+
+
+def _send_via_brevo(to_email: str, subject: str, body: str) -> bool:
+    """Brevo (Sendinblue) HTTPS API — also works on Render."""
+    api_key = (getattr(settings, "BREVO_API_KEY", "") or "").strip()
+    if not api_key:
+        return False
+    sender_email = getattr(settings, "BREVO_SENDER_EMAIL", "") or ""
+    # Parse "Name <email@x.com>" if needed
+    from_addr = _from_email()
+    name = "AI Assistant"
+    email = sender_email
+    if "<" in from_addr and ">" in from_addr:
+        name = from_addr.split("<", 1)[0].strip() or name
+        email = email or from_addr.split("<", 1)[1].rstrip(">").strip()
+    if not email:
+        email = from_addr
+    resp = requests.post(
+        "https://api.brevo.com/v3/smtp/email",
+        headers={
+            "api-key": api_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        json={
+            "sender": {"name": name, "email": email},
+            "to": [{"email": to_email}],
+            "subject": subject,
+            "textContent": body,
+        },
+        timeout=EMAIL_SEND_TIMEOUT,
+    )
+    if resp.status_code >= 400:
+        logger.error("Brevo API error %s: %s", resp.status_code, resp.text[:500])
+        resp.raise_for_status()
+    return True
+
+
+def _send_via_smtp(to_email: str, subject: str, body: str) -> bool:
     timeout = int(getattr(settings, "EMAIL_TIMEOUT", EMAIL_SEND_TIMEOUT) or EMAIL_SEND_TIMEOUT)
-
-    # No SMTP configured → console / show code in DEBUG
-    if not (getattr(settings, "EMAIL_HOST", "") or "").strip():
-        logger.info("OTP for %s (no EMAIL_HOST): %s", user.email, otp.code)
-        try:
-            send_mail(subject, body, from_email, [user.email], fail_silently=True)
-        except Exception:
-            logger.exception("Console email failed")
-        return (False, otp.code) if settings.DEBUG else (True, "")
-
     previous_timeout = socket.getdefaulttimeout()
     try:
         socket.setdefaulttimeout(timeout)
@@ -62,21 +116,62 @@ def send_otp_email(user, otp: EmailOTP) -> tuple[bool, str]:
         sent = send_mail(
             subject,
             body,
-            from_email,
-            [user.email],
+            _from_email(),
+            [to_email],
             connection=connection,
             fail_silently=False,
         )
-        if sent:
-            return True, ""
-    except Exception as exc:
-        logger.exception("OTP email failed for %s: %s", user.email, exc)
-        # Allow local/dev recovery; avoid leaking OTP in production toasts
-        if settings.DEBUG:
-            return False, otp.code
-        return False, ""
+        return bool(sent)
     finally:
         socket.setdefaulttimeout(previous_timeout)
+
+
+def send_otp_email(user, otp: EmailOTP) -> tuple[bool, str]:
+    """Send OTP via HTTPS email API when possible (Render blocks SMTP).
+
+    Returns (ok, detail). detail may include OTP code in DEBUG.
+    """
+    subject, body = _otp_body(user, otp)
+    to_email = user.email
+
+    # 1) Prefer HTTPS providers (Render-compatible)
+    for name, sender in (
+        ("Resend", _send_via_resend),
+        ("Brevo", _send_via_brevo),
+    ):
+        api_configured = (
+            (name == "Resend" and (getattr(settings, "RESEND_API_KEY", "") or "").strip())
+            or (name == "Brevo" and (getattr(settings, "BREVO_API_KEY", "") or "").strip())
+        )
+        if not api_configured:
+            continue
+        try:
+            if sender(to_email, subject, body):
+                logger.info("OTP email sent via %s to %s", name, to_email)
+                return True, ""
+        except Exception as exc:
+            logger.exception("OTP email via %s failed for %s: %s", name, to_email, exc)
+
+    # 2) SMTP (often blocked on Render free/web — Errno 101 Network unreachable)
+    if (getattr(settings, "EMAIL_HOST", "") or "").strip():
+        try:
+            if _send_via_smtp(to_email, subject, body):
+                return True, ""
+        except OSError as exc:
+            logger.exception(
+                "OTP SMTP failed for %s (Render often blocks SMTP ports): %s. "
+                "Set RESEND_API_KEY instead.",
+                to_email,
+                exc,
+            )
+        except Exception as exc:
+            logger.exception("OTP email failed for %s: %s", to_email, exc)
+    else:
+        logger.info("OTP for %s (no email provider): %s", to_email, otp.code)
+        try:
+            send_mail(subject, body, _from_email(), [to_email], fail_silently=True)
+        except Exception:
+            pass
 
     if settings.DEBUG:
         return False, otp.code
