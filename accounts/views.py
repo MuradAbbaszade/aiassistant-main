@@ -118,7 +118,7 @@ def register_view(request):
             phone=form.cleaned_data.get("phone") or "",
             email_verified=False,
         )
-        return _start_otp(request, user)
+        return _start_otp(request, user, force=True)
 
     return render(request, "accounts/register.html", {"form": form})
 
@@ -145,7 +145,7 @@ def login_view(request):
             else:
                 profile, _ = UserProfile.objects.get_or_create(user=authed)
                 if not profile.email_verified:
-                    return _start_otp(request, authed)
+                    return _start_otp(request, authed, force=True)
                 _establish_session(request, authed)
                 return _post_login_redirect(authed)
 
@@ -178,7 +178,11 @@ def verify_email_view(request):
     return render(
         request,
         "accounts/verify_otp.html",
-        {"form": form, "email": user.email},
+        {
+            "form": form,
+            "email": user.email,
+            "resend_wait_seconds": _otp_resend_wait_seconds(request),
+        },
     )
 
 
@@ -188,7 +192,7 @@ def resend_otp_view(request):
     user = User.objects.filter(pk=user_id).first() if user_id else None
     if not user:
         return redirect("accounts:login")
-    return _start_otp(request, user)
+    return _start_otp(request, user, force=False)
 
 
 def onboarding_view(request):
