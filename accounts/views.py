@@ -42,20 +42,25 @@ def _post_login_redirect(user):
 
 
 def _start_otp(request, user):
+    """Create OTP and attempt email send without blocking the HTTP request forever."""
     otp = create_email_otp(user)
-    ok, detail = send_otp_email(user, otp)
     request.session["pending_otp_user_id"] = user.id
     from django.conf import settings
+
+    try:
+        ok, detail = send_otp_email(user, otp)
+    except Exception:
+        ok, detail = False, otp.code if settings.DEBUG else ""
 
     if ok:
         messages.success(request, "Emailinizə təsdiq kodu göndərildi.")
     elif detail:
-        messages.info(
-            request,
-            f"Email göndərilmədi. Test OTP kodunuz: {detail}",
-        )
+        messages.info(request, f"Email göndərilmədi. Test OTP kodunuz: {detail}")
     else:
-        messages.error(request, "OTP göndərilmədi. Bir az sonra yenidən cəhd edin.")
+        messages.error(
+            request,
+            "Email göndərilmədi (SMTP cavab vermir). Bir az sonra «Kodu yenidən göndər» edin.",
+        )
     if settings.DEBUG:
         messages.info(request, f"DEBUG OTP: {otp.code}")
     return redirect("accounts:verify_email")
