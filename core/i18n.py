@@ -479,6 +479,8 @@ STRINGS: dict[str, dict[str, str]] = {
     "auth.optional": {"az": "istəyə bağlı", "en": "optional", "ru": "необязательно"},
     "auth.password": {"az": "Şifrə", "en": "Password", "ru": "Пароль"},
     "auth.password_confirm": {"az": "Şifrə (təkrar)", "en": "Confirm password", "ru": "Повторите пароль"},
+    "auth.show_password": {"az": "Göstər", "en": "Show", "ru": "Показать"},
+    "auth.hide_password": {"az": "Gizlət", "en": "Hide", "ru": "Скрыть"},
     "auth.register_cta": {"az": "Qeydiyyatdan keç", "en": "Create account", "ru": "Зарегистрироваться"},
     "auth.login_cta": {"az": "Daxil ol", "en": "Sign in", "ru": "Войти"},
     "auth.have_account": {"az": "Artıq hesabınız var?", "en": "Already have an account?", "ru": "Уже есть аккаунт?"},

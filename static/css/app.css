@@ -689,6 +689,37 @@ a { color: inherit; text-decoration: none; }
   border-radius: 0 !important;
   margin: 0;
 }
+.password-field {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--navy);
+}
+.password-field input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+.password-toggle {
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: rgba(0, 217, 255, 0.08);
+  color: var(--cyan);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.password-toggle:hover {
+  background: rgba(0, 217, 255, 0.16);
+  color: var(--ice);
+}
 .setup-choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

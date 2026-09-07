@@ -39,11 +39,17 @@
       {% if form.phone.errors %}<div class="field-error">{{ form.phone.errors.0 }}</div>{% endif %}
 
       <label for="id_password">{{ t.auth_password }}</label>
-      <input id="id_password" type="password" name="password" required autocomplete="new-password">
+      <div class="password-field">
+        <input id="id_password" type="password" name="password" required autocomplete="new-password">
+        <button type="button" class="password-toggle" data-target="id_password" data-show="{{ t.auth_show_password }}" data-hide="{{ t.auth_hide_password }}" aria-label="{{ t.auth_show_password }}">{{ t.auth_show_password }}</button>
+      </div>
       {% if form.password.errors %}<div class="field-error">{{ form.password.errors.0 }}</div>{% endif %}
 
       <label for="id_password_confirm">{{ t.auth_password_confirm }}</label>
-      <input id="id_password_confirm" type="password" name="password_confirm" required autocomplete="new-password">
+      <div class="password-field">
+        <input id="id_password_confirm" type="password" name="password_confirm" required autocomplete="new-password">
+        <button type="button" class="password-toggle" data-target="id_password_confirm" data-show="{{ t.auth_show_password }}" data-hide="{{ t.auth_hide_password }}" aria-label="{{ t.auth_show_password }}">{{ t.auth_show_password }}</button>
+      </div>
       {% if form.password_confirm.errors %}<div class="field-error">{{ form.password_confirm.errors.0 }}</div>{% endif %}
 
       <button class="btn btn-primary" style="width:100%;margin-top:1.1rem;" type="submit">{{ t.auth_register_cta }}</button>
@@ -54,4 +60,16 @@
     </p>
   </div>
 </div>
+<script>
+document.querySelectorAll('.password-toggle').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.target);
+    if (!input) return;
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.textContent = show ? btn.dataset.hide : btn.dataset.show;
+    btn.setAttribute('aria-label', btn.textContent);
+  });
+});
+</script>
 {% endblock %}
