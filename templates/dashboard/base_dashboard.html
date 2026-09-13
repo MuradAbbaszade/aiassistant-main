@@ -4,7 +4,7 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
-    <div class="brand">AI Assistant</div>
+    <a href="{% url 'marketing:landing' %}" class="brand">AI Assistant</a>
     <a href="{% url 'analytics:dashboard' %}" class="{% if active_nav == 'dashboard' %}active{% endif %}">{{ t.dash_dashboard }}</a>
     <a href="{% url 'conversations:list' %}" class="{% if active_nav == 'conversations' %}active{% endif %}">{{ t.dash_conversations }}</a>
     <a href="{% url 'knowledge:list' %}" class="{% if active_nav == 'knowledge' %}active{% endif %}">{{ t.dash_knowledge }}</a>
