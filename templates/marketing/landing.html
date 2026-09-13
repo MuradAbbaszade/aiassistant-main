@@ -90,6 +90,7 @@
   <ul class="industry-mosaic">
     {% for i in industries %}
     <li class="industry-item" data-industry="{{ i.key }}" style="--i: {{ forloop.counter0 }}">
+      <span class="industry-icon" aria-hidden="true"></span>
       <span class="industry-idx">{% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}</span>
       <span class="industry-name">{{ i.label }}</span>
     </li>
@@ -100,20 +101,16 @@
 <section class="section pricing-section" id="pricing">
   <div class="section-head pricing-head">
     <h2 class="pricing-title">{{ t.pricing_title }}</h2>
-    <p class="section-lead">{{ t.pricing_lead }}</p>
   </div>
   <div class="pricing-grid">
     {% for plan in pricing_plans %}
     <article class="price-card{% if plan.featured %} is-featured{% endif %}" style="--i: {{ forloop.counter0 }}">
-      {% if plan.featured %}
+      {% if plan.featured and plan.badge %}
       <span class="price-card-ribbon">{{ plan.badge }}</span>
       {% endif %}
       <div class="price-card-top">
         <div class="price-card-heading">
           <h3>{{ plan.name }}</h3>
-          {% if not plan.featured and plan.badge %}
-          <span class="price-card-tag">{{ plan.badge }}</span>
-          {% endif %}
         </div>
         <div class="price-card-amount">
           <span class="price-num">{{ plan.price }}</span>
@@ -126,7 +123,6 @@
         <li>{{ f }}</li>
         {% endfor %}
       </ul>
-      <p class="price-extra">{{ plan.extra }}</p>
       <a class="btn {% if plan.featured %}btn-primary{% else %}btn-ghost price-btn{% endif %} price-cta" href="{% url 'accounts:register' %}">{{ t.pricing_cta }}</a>
     </article>
     {% endfor %}
