@@ -20,6 +20,12 @@ SECRET_KEY = env("SECRET_KEY", default="dev-only-ai-assistant-insecure-key-chang
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
+# Extra custom domains (comma-separated), e.g. aiassistant.softsmith.info
+for _extra in env.list("CUSTOM_DOMAINS", default=[]):
+    _extra = (_extra or "").strip().lower()
+    if _extra and _extra not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_extra)
+
 # Cloudflare / ngrok tunnels need HTTPS origins listed for POST forms (Knowledge Base, etc.)
 _csrf_origins = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 _public = env("PUBLIC_BASE_URL", default="").strip().rstrip("/")
