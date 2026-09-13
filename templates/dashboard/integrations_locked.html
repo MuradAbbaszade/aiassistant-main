@@ -1,0 +1,13 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block page_title %}{{ t.int_title }}{% endblock %}
+{% block content %}
+<h1>{{ t.int_title }}</h1>
+<p class="muted">{{ t.int_lead }}</p>
+
+<div class="panel" style="max-width:720px;">
+  <h2 style="margin-top:0;">{{ t.int_locked_title }}</h2>
+  <p>{{ t.int_locked_body }}</p>
+  <p class="muted" style="margin-top:0.75rem;">{{ t.int_locked_hint }}</p>
+  <a class="btn btn-primary" style="margin-top:1rem;" href="{{ support_whatsapp_url }}" target="_blank" rel="noopener">{{ t.int_upgrade }}</a>
+</div>
+{% endblock %}

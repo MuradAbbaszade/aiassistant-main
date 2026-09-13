@@ -243,6 +243,14 @@ def lead_status_api(request, pk: int):
         return Response({"error": "invalid status"}, status=status.HTTP_400_BAD_REQUEST)
     lead.status = new_status
     lead.save(update_fields=["status", "updated_at"])
+    try:
+        from integrations.services.dispatch import emit_lead_updated
+
+        emit_lead_updated(lead)
+    except Exception:
+        import logging
+
+        logging.getLogger(__name__).exception("Failed to emit lead.updated webhook")
     return Response({"id": lead.id, "status": lead.status})
 
 

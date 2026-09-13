@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "leads",
     "ai",
     "channels",
+    "integrations",
     "analytics",
     "demo",
     "marketing",

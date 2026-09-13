@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from ai.models import AISettings
 from analytics.models import AnalyticsSnapshot
-from businesses.models import Business, BusinessType
+from businesses.models import Business, BusinessPlan, BusinessType
 from channels.models import Channel, ChannelStatus, ChannelType
 from conversations.models import Conversation, ConversationStatus, Message, MessageLabel, MessageSender
 from knowledge.models import KnowledgeItem, KnowledgeType
@@ -94,6 +94,7 @@ class Command(BaseCommand):
         ]
         out = {}
         for row in data:
+            row = {**row, "plan": BusinessPlan.BUSINESS}
             out[row["id"]] = Business.objects.create(**row)
         return out
 

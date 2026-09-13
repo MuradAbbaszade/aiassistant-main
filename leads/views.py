@@ -35,5 +35,13 @@ def lead_update_status(request, pk: int):
     if status in {c.value for c in LeadStatus}:
         lead.status = status
         lead.save(update_fields=["status", "updated_at"])
+        try:
+            from integrations.services.dispatch import emit_lead_updated
+
+            emit_lead_updated(lead)
+        except Exception:
+            import logging
+
+            logging.getLogger(__name__).exception("Failed to emit lead.updated webhook")
         messages.success(request, "Status yeniləndi.")
     return redirect("leads:list")

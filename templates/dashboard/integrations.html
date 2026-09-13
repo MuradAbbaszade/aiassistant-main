@@ -1,0 +1,130 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block page_title %}{{ t.int_title }}{% endblock %}
+{% block content %}
+<h1>{{ t.int_title }}</h1>
+<p class="muted">{{ t.int_lead }}</p>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <h2 style="margin-top:0;">{{ t.int_how_title }}</h2>
+  <ol class="steps" style="margin:0;">
+    <li>{{ t.int_how_1 }}</li>
+    <li>{{ t.int_how_2 }}</li>
+    <li>{{ t.int_how_3 }}</li>
+  </ol>
+  <p class="muted" style="margin-top:1rem;">{{ t.int_headers_hint }}</p>
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <h2 style="margin-top:0;">{{ t.int_add_title }}</h2>
+  <form method="post" action="{% url 'integrations:endpoint_create' %}">
+    {% csrf_token %}
+    <label>{{ t.int_name }}</label>
+    <input name="name" placeholder="Bitrix / amoCRM / custom" maxlength="120">
+    <label style="margin-top:0.75rem;display:block;">{{ t.int_url }}</label>
+    <input name="url" type="url" required placeholder="https://your-crm.example/hooks/ai-assistant">
+    <fieldset style="margin-top:0.9rem;border:0;padding:0;">
+      <legend style="font-weight:700;margin-bottom:0.4rem;">{{ t.int_events }}</legend>
+      {% for ev in event_choices %}
+      <label style="display:flex;align-items:center;gap:0.45rem;margin:0.25rem 0;font-weight:500;">
+        <input type="checkbox" name="events" value="{{ ev.value }}" checked>
+        <code>{{ ev.value }}</code>
+      </label>
+      {% endfor %}
+    </fieldset>
+    <button class="btn btn-primary" style="margin-top:1rem;" type="submit">{{ t.int_save }}</button>
+  </form>
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <h2 style="margin-top:0;">{{ t.int_endpoints }}</h2>
+  {% if endpoints %}
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{ t.int_name }}</th>
+          <th>URL</th>
+          <th>{{ t.int_secret }}</th>
+          <th>{{ t.int_status }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ep in endpoints %}
+        <tr>
+          <td><strong>{{ ep.name }}</strong><div class="muted" style="font-size:0.8rem;">{{ ep.events|join:", " }}</div></td>
+          <td style="max-width:220px;word-break:break-all;font-size:0.85rem;">{{ ep.url }}</td>
+          <td><code style="font-size:0.75rem;word-break:break-all;">{{ ep.secret }}</code></td>
+          <td>
+            {% if ep.is_active %}
+            <span class="badge badge-ok">{{ t.int_active }}</span>
+            {% else %}
+            <span class="badge badge-warn">{{ t.int_inactive }}</span>
+            {% endif %}
+          </td>
+          <td style="white-space:nowrap;">
+            <form method="post" action="{% url 'integrations:endpoint_test' ep.pk %}" style="display:inline;">{% csrf_token %}
+              <button class="btn btn-ghost" type="submit" style="padding:0.4rem 0.7rem;font-size:0.8rem;">{{ t.int_test }}</button>
+            </form>
+            <form method="post" action="{% url 'integrations:endpoint_toggle' ep.pk %}" style="display:inline;">{% csrf_token %}
+              <button class="btn btn-ghost" type="submit" style="padding:0.4rem 0.7rem;font-size:0.8rem;">{% if ep.is_active %}{{ t.int_disable }}{% else %}{{ t.int_enable }}{% endif %}</button>
+            </form>
+            <form method="post" action="{% url 'integrations:endpoint_delete' ep.pk %}" style="display:inline;" onsubmit="return confirm('Delete webhook?');">{% csrf_token %}
+              <button class="btn btn-ghost" type="submit" style="padding:0.4rem 0.7rem;font-size:0.8rem;">{{ t.int_delete }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">{{ t.int_empty }}</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0;">{{ t.int_deliveries }}</h2>
+  {% if deliveries %}
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{ t.int_col_time }}</th>
+          <th>{{ t.int_col_event }}</th>
+          <th>{{ t.int_col_endpoint }}</th>
+          <th>{{ t.int_status }}</th>
+          <th>{{ t.int_col_code }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in deliveries %}
+        <tr>
+          <td class="muted" style="white-space:nowrap;font-size:0.85rem;">{{ d.created_at|date:"d.m H:i" }}</td>
+          <td><code>{{ d.event_type }}</code></td>
+          <td>{{ d.endpoint.name }}</td>
+          <td>
+            {% if d.status == "success" %}<span class="badge badge-ok">{{ d.status }}</span>
+            {% elif d.status == "failed" %}<span class="badge" style="background:#7f1d1d;">{{ d.status }}</span>
+            {% else %}<span class="badge badge-warn">{{ d.status }}</span>{% endif %}
+            {% if d.last_error %}<div class="muted" style="font-size:0.75rem;max-width:180px;">{{ d.last_error }}</div>{% endif %}
+          </td>
+          <td>{{ d.response_code|default:"—" }} <span class="muted">×{{ d.attempts }}</span></td>
+          <td>
+            {% if d.status != "success" %}
+            <form method="post" action="{% url 'integrations:delivery_retry' d.pk %}">{% csrf_token %}
+              <button class="btn btn-ghost" type="submit" style="padding:0.35rem 0.65rem;font-size:0.8rem;">{{ t.int_retry }}</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">{{ t.int_deliveries_empty }}</p>
+  {% endif %}
+</div>
+{% endblock %}

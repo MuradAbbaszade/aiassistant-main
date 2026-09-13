@@ -11,6 +11,7 @@
     <a href="{% url 'leads:list' %}" class="{% if active_nav == 'leads' %}active{% endif %}">{{ t.dash_leads }}</a>
     <a href="{% url 'ai:settings' %}" class="{% if active_nav == 'ai_settings' %}active{% endif %}">{{ t.dash_ai }}</a>
     <a href="{% url 'channels:list' %}" class="{% if active_nav == 'channels' %}active{% endif %}">{{ t.dash_channels }}</a>
+    <a href="{% url 'integrations:home' %}" class="{% if active_nav == 'integrations' %}active{% endif %}">{{ t.dash_integrations }}</a>
     <a href="{% url 'analytics:analytics' %}" class="{% if active_nav == 'analytics' %}active{% endif %}">{{ t.dash_analytics }}</a>
     <a href="{% url 'demo:chat' %}" class="{% if active_nav == 'demo' %}active{% endif %}">{{ t.dash_demo }}</a>
     <div class="sidebar-footer">

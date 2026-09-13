@@ -102,4 +102,13 @@ def maybe_create_lead(
         status=LeadStatus.NEW,
         conversation=conversation,
     )
+    try:
+        from integrations.services.dispatch import emit_lead_created
+
+        emit_lead_created(lead)
+    except Exception:
+        # Never block chat flow on webhook failures
+        import logging
+
+        logging.getLogger(__name__).exception("Failed to emit lead.created webhook")
     return lead, detection

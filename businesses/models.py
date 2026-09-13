@@ -12,10 +12,21 @@ class BusinessType(models.TextChoices):
     OTHER = "other", "Digər"
 
 
+class BusinessPlan(models.TextChoices):
+    STANDARD = "standard", "Standart"
+    BUSINESS = "business", "Biznes"
+
+
 class Business(models.Model):
     id = models.SlugField(primary_key=True, max_length=64)
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=32, choices=BusinessType.choices, default=BusinessType.OTHER)
+    plan = models.CharField(
+        max_length=32,
+        choices=BusinessPlan.choices,
+        default=BusinessPlan.STANDARD,
+        db_index=True,
+    )
     description = models.TextField(blank=True)
     city = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=40, blank=True)
@@ -31,3 +42,7 @@ class Business(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def has_integrations(self) -> bool:
+        return self.plan == BusinessPlan.BUSINESS

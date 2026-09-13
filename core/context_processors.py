@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from businesses.models import Business
 from core.i18n import LANG_LABELS, SUPPORTED_LANGS, DEFAULT_LANG, normalize_lang, template_strings
 
@@ -14,6 +16,9 @@ def tenant(request):
     if getattr(request, "user", None) and request.user.is_authenticated:
         name = request.user.get_full_name() or name or request.user.email
         email = request.user.email or email
+    phone = "".join(
+        c for c in str(getattr(settings, "SUPPORT_WHATSAPP", "994705550117")) if c.isdigit()
+    )
     return {
         "current_business": getattr(request, "current_business", None),
         "all_businesses": businesses,
@@ -23,5 +28,9 @@ def tenant(request):
         "ui_lang": lang,
         "t": template_strings(lang),
         "lang_choices": [{"code": c, "label": LANG_LABELS[c]} for c in SUPPORTED_LANGS],
-        "support_whatsapp_url": "https://wa.me/994705550117",
+        "support_whatsapp_url": f"https://wa.me/{phone}",
+        "has_integrations": bool(
+            getattr(request, "current_business", None)
+            and getattr(request.current_business, "has_integrations", False)
+        ),
     }

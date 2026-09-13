@@ -14,6 +14,7 @@ urlpatterns = [
     path("", include("conversations.urls")),
     path("", include("leads.urls")),
     path("", include("channels.urls")),
+    path("", include("integrations.urls")),
     path("", include("ai.urls")),
     path("", include("demo.urls")),
     # API
