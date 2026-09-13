@@ -9,6 +9,7 @@
       <a href="#benefits">{{ t.nav_benefits }}</a>
       <a href="#features">{{ t.nav_features }}</a>
       <a href="#industries">{{ t.nav_industries }}</a>
+      <a href="#pricing">{{ t.nav_pricing }}</a>
       <a href="#how">{{ t.nav_how }}</a>
       <a class="nav-links-signin" href="{% url 'accounts:login' %}">{{ t.nav_signin }}</a>
     </nav>
@@ -80,14 +81,54 @@
   </div>
 </section>
 
-<section class="section band" id="industries">
-  <div class="section-head">
+<section class="section band industries-band" id="industries">
+  <div class="industries-glow" aria-hidden="true"></div>
+  <div class="section-head industries-head">
     <h2>{{ t.industries_title }}</h2>
     <p class="section-lead">{{ t.industries_lead }}</p>
   </div>
-  <div class="industry-row">
+  <ul class="industry-mosaic">
     {% for i in industries %}
-    <span>{{ i }}</span>
+    <li class="industry-item" data-industry="{{ i.key }}" style="--i: {{ forloop.counter0 }}">
+      <span class="industry-idx">{% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}</span>
+      <span class="industry-name">{{ i.label }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="section pricing-section" id="pricing">
+  <div class="section-head pricing-head">
+    <h2 class="pricing-title">{{ t.pricing_title }}</h2>
+    <p class="section-lead">{{ t.pricing_lead }}</p>
+  </div>
+  <div class="pricing-grid">
+    {% for plan in pricing_plans %}
+    <article class="price-card{% if plan.featured %} is-featured{% endif %}" style="--i: {{ forloop.counter0 }}">
+      {% if plan.featured %}
+      <span class="price-card-ribbon">{{ plan.badge }}</span>
+      {% endif %}
+      <div class="price-card-top">
+        <div class="price-card-heading">
+          <h3>{{ plan.name }}</h3>
+          {% if not plan.featured and plan.badge %}
+          <span class="price-card-tag">{{ plan.badge }}</span>
+          {% endif %}
+        </div>
+        <div class="price-card-amount">
+          <span class="price-num">{{ plan.price }}</span>
+          <span class="price-unit">{{ t.pricing_per_mo }}</span>
+        </div>
+        <p class="price-card-desc">{{ plan.desc }}</p>
+      </div>
+      <ul class="price-features">
+        {% for f in plan.features %}
+        <li>{{ f }}</li>
+        {% endfor %}
+      </ul>
+      <p class="price-extra">{{ plan.extra }}</p>
+      <a class="btn {% if plan.featured %}btn-primary{% else %}btn-ghost price-btn{% endif %} price-cta" href="{% url 'accounts:register' %}">{{ t.pricing_cta }}</a>
+    </article>
     {% endfor %}
   </div>
 </section>
