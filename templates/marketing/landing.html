@@ -14,14 +14,14 @@
       {% if not is_demo_logged_in %}
       <a class="nav-links-signin" href="{% url 'accounts:login' %}">{{ t.nav_signin }}</a>
       {% else %}
-      <a class="nav-links-signin" href="{% url 'analytics:dashboard' %}">{{ t.dash_dashboard }}</a>
+      <a class="nav-links-signin" href="{% url 'analytics:dashboard' %}">{{ t.nav_go_dashboard }}</a>
       {% endif %}
     </nav>
     <div class="nav-actions">
       <button type="button" class="nav-toggle" id="landingNavToggle" aria-expanded="false" aria-controls="landingNav" aria-label="Menu">☰</button>
       {% include "partials/lang_switcher.html" %}
       {% if is_demo_logged_in %}
-      <a class="nav-profile" href="{% url 'analytics:dashboard' %}" title="{{ demo_user_name|default:demo_user_email|default:t.dash_dashboard }}" aria-label="{{ t.dash_dashboard }}">
+      <a class="nav-profile" href="{% url 'analytics:dashboard' %}" title="{{ t.nav_go_dashboard }}" aria-label="{{ t.nav_go_dashboard }}">
         <span class="avatar nav-profile-avatar">{{ demo_user_name|default:demo_user_email|default:"A"|first|upper }}</span>
       </a>
       {% else %}

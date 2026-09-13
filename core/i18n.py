@@ -26,6 +26,11 @@ STRINGS: dict[str, dict[str, str]] = {
     "nav.how": {"az": "Necə işləyir", "en": "How it works", "ru": "Как это работает"},
     "nav.signin": {"az": "Daxil ol", "en": "Sign in", "ru": "Войти"},
     "nav.connect": {"az": "Qeydiyyat", "en": "Sign up", "ru": "Регистрация"},
+    "nav.go_dashboard": {
+        "az": "Dashboarda keç",
+        "en": "Go to Dashboard",
+        "ru": "Перейти в панель",
+    },
     "hero.headline": {
         "az": "Pulunuza və vaxtınıza qənaət edin — daha çox müştəri qazanın.",
         "en": "Save money and time — win more customers.",
